@@ -1,5 +1,6 @@
 import System.IO ( stdout, hFlush )
-import System.Random
+import Data.List ( delete )
+import System.Random ( getStdRandom, Random(randomR) )
 
 sortWith :: (Char -> Char -> IO Bool) -> [Char] -> IO [Char]
 sortWith f [x] = return [x]
@@ -8,6 +9,7 @@ sortWith f xs = do
   let maxN = length xs
   n <- getStdRandom . randomR $ (0, maxN)
   let x = xs !! n
+  let xs' = delete x xs
   (ls,gs) <- partitionIO (f x) xs
   ls' <- sortWith f ls
   gs' <- sortWith f gs
