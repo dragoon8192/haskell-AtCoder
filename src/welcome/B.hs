@@ -7,10 +7,10 @@ sortWith f [x] = return [x]
 sortWith f [] = return []
 sortWith f xs = do
   let maxN = length xs
-  n <- getStdRandom . randomR $ (0, maxN)
+  n <- getStdRandom . randomR $ (0, maxN - 1)
   let x = xs !! n
   let xs' = delete x xs
-  (ls,gs) <- partitionIO (f x) xs
+  (ls,gs) <- partitionIO (f x) xs'
   ls' <- sortWith f ls
   gs' <- sortWith f gs
   return $ ls' ++ x : gs'
