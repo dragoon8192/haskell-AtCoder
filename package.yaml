@@ -1,6 +1,6 @@
 name:                AtCoder
 version:             0.1.0.0
-github:              "dragoon8192/AtCoder"
+github:              "dragoon8192/haskell-AtCoder"
 license:             BSD3
 author:              "DRAGOON8192"
 maintainer:          "dragoon8192@gmail.com"
