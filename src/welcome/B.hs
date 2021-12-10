@@ -1,13 +1,15 @@
 import System.IO ( stdout, hFlush )
 import Data.List ( delete )
 import System.Random ( getStdRandom, Random(randomR) )
+import Control.Monad.Trans.State.Strict
+import Control.Monad.Trans
 
-sortWith :: (Char -> Char -> IO Bool) -> [Char] -> IO [Char]
+sortWith :: (Char -> Char -> StateT Int IO Bool) -> [Char] -> StateT Int IO [Char]
 sortWith f [x] = return [x]
 sortWith f [] = return []
 sortWith f xs = do
   let maxN = length xs
-  n <- getStdRandom . randomR $ (0, maxN - 1)
+  n <- lift . getStdRandom . randomR $ (0, maxN - 1)
   let x = xs !! n
   let xs' = delete x xs
   (ls,gs) <- partitionIO (f x) xs'
@@ -15,7 +17,7 @@ sortWith f xs = do
   gs' <- sortWith f gs
   return $ ls' ++ x : gs'
     where
-      partitionIO :: (x -> IO Bool) -> [x] -> IO ([x], [x])
+      partitionIO :: (x -> StateT Int IO Bool) -> [x] -> StateT Int IO ([x], [x])
       partitionIO = partitionIO' ([], [])
         where
           partitionIO' (ts, fs) g (x:xs) = do
@@ -26,20 +28,27 @@ sortWith f xs = do
               partitionIO' (ts, x:fs) g xs
           partitionIO' ans _ [] = return ans
 
-question :: Char -> Char -> IO Bool
+question :: Char -> Char -> StateT Int IO Bool
 question a b = do
-  putStrLn . unwords $ ["?",[a],[b]]
-  hFlush stdout
-  ans <- getLine
-  case ans of
-    ">" -> return True
-    _   -> return False
+  q <- get
+  if q >= 1
+  then do
+    modify (+ (-1))
+    lift . putStrLn . unwords $ ["?",[a],[b]]
+    lift . hFlush $ stdout
+    ans <- lift getLine
+    case ans of
+      ">" -> return True
+      _   -> return False
+  else
+    return False
+
 
 main :: IO ()
 main = do
   [n, q] <- map read . words <$> getLine
   let str = take n ['A', 'B' ..]
-  ans <- sortWith question str
+  ans <- flip evalStateT q $ sortWith question str
   putStrLn . unwords $ ["!", ans]
   hFlush stdout
   return ()
