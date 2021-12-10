@@ -27,7 +27,9 @@ library
   exposed-modules:
       ABC081.A
       ABC081.B
+      ABC083.B
       ABC086.A
+      ABC087.B
   other-modules:
       Paths_AtCoder
   hs-source-dirs:
