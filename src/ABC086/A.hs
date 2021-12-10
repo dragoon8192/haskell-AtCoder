@@ -1,5 +1,5 @@
 main = do
-  putStrLn . prodEven . map readInt . words =<< readLn
+  putStrLn . prodEven . map readInt . words =<< getLine
 
 prodEven xs = if any even xs then "Even" else "Odd"
 
