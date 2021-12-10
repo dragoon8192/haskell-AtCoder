@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       ABC081.A
+      ABC081.B
       ABC086.A
   other-modules:
       Paths_AtCoder
