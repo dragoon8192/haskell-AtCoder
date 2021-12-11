@@ -4,9 +4,10 @@ import Control.Monad.Fix
 
 main =do
   s <- getLine
-  if dream s
-  then putStrLn "Yes"
-  else putStrLn "No"
+  putStrLn $
+    if dream s
+    then "YES"
+    else "NO"
 
 gens = ["dream", "dreamer", "erase", "eraser"]
 step :: String -> [String]
