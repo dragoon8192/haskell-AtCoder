@@ -3,4 +3,5 @@ main = do
   print . sum . filter (f a b) $ [1..n]
     where
       f a b x = a <= g x && g x <= b
-      g = sum . map (read . (:[])) . show
+      g 0 = 0
+      g x = mod x 10 + g (div x 10)
