@@ -30,6 +30,7 @@ library
       ABC083.B
       ABC086.A
       ABC087.B
+      ABC088.B
   other-modules:
       Paths_AtCoder
   hs-source-dirs:
