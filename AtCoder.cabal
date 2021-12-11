@@ -25,6 +25,7 @@ source-repository head
 
 library
   exposed-modules:
+      ABC049.C
       ABC081.A
       ABC081.B
       ABC083.B

@@ -18,4 +18,4 @@ dream str = flip fix [str] $
             \loop xs -> case xs of
                 "":_  -> True
                 []    -> False
-                _     -> loop . (step =<<) $ xs
+                _     -> loop . concatMap step $ xs
