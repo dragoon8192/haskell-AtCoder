@@ -40,6 +40,7 @@ library
       ABC231.C
       ABC231.D
       ABC231.E
+      AHC007.A
   other-modules:
       Paths_AtCoder
   hs-source-dirs:
