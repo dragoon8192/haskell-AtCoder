@@ -3,8 +3,11 @@ import Control.Monad.Reader
       MonadTrans(lift),
       MonadReader(ask),
       ReaderT(runReaderT) )
-import System.IO ( stdout, hFlush )
 import Data.Maybe ( fromJust )
+import Data.Ord
+import Data.List
+
+import System.IO ( stdout, hFlush )
 import qualified Data.ByteString.Char8 as BS
 
 flush = hFlush stdout
@@ -25,14 +28,18 @@ getIntNTuples n = map readIntTuple <$> getNBSs n
 
 main = do
   points <- getIntNTuples 400 :: IO [Point]
+  -- putStrLn $ "points :" ++ show points
   nodeDoms <- getIntNTuples 1995 :: IO [NodeDom]
+  -- putStrLn $ "doms :" ++ show nodeDoms
   let nodes = zip nodeDoms . repeat $ Nothing :: [Node]
   flip runReaderT points $ loop [] nodes
+
+sortByIJ = sortBy . comparing $ fst
 
 loop :: [Node] -> [Node] -> CalcState ()
 loop decided (n:nodes) = do
   l <- lift getInt
-  b <- existsShorterPath l n (decided ++ nodes)
+  b <- notExistsShorterPath l n . sortByIJ $ decided ++ nodes
   if b
   then do
     lift $ print 1
@@ -56,7 +63,7 @@ type CalcState = ReaderT [Point] IO
 
 expectedLen :: Node -> CalcState Int
 expectedLen (_, Just l) = return l
-expectedLen ((i, j), Nothing) = (2 *) <$> distance i j
+expectedLen ((i, j), Nothing) =  round . (1.0 *) . fromIntegral <$> distance i j
 
 distance :: Int -> Int -> CalcState Int
 distance i j = do
@@ -65,8 +72,8 @@ distance i j = do
   let (xj, yj) = ps !! i
   return . round .  sqrt . fromIntegral $ (xi - xj)^2 + (yi - yj)^2
 
-existsShorterPath :: Int -> Node-> [Node] -> CalcState Bool
-existsShorterPath l (ij,_) ns = not . null <$> shorterPaths l ij ns
+notExistsShorterPath :: Int -> Node-> [Node] -> CalcState Bool
+notExistsShorterPath l (ij,_) ns = null <$> shorterPaths l ij ns
 
 shorterPaths :: Int -> NodeDom -> [Node] -> CalcState [Bool]
 shorterPaths l (i, j) (n@((ni,nj), _):ns) = do
@@ -80,4 +87,3 @@ shorterPaths l (i, j) (n@((ni,nj), _):ns) = do
           return $ step ++ hold
   else shorterPaths l (i, j) ns
 shorterPaths _ _ [] = return []
-

@@ -3,8 +3,6 @@ import Control.Monad ( replicateM )
 import Data.Maybe ( fromJust )
 import qualified Data.ByteString.Char8 as BS
 
-import Data.List
-
 flush :: IO ()
 flush = hFlush stdout
 
@@ -42,11 +40,3 @@ getIntTuplesN :: (Integral a, Integral n) => n -> IO [(a, a)]
 getIntTuplesN n = map readIntTuple <$> getNBSs n
 getIntTuplesAll :: (Integral a) => IO [(a, a)]
 getIntTuplesAll = map readIntTuple . BS.lines <$> BS.getContents
-
-main = do
-  (n, q) <- getIntTuple
-  as <- getIntList
-  let as' = sort as
-  xs <- getIntsN q
-  let ans = [(n -) . fromJust . findIndex (x <=) $ as' | x <- xs]
-  BS.putStr . BS.unlines . map (BS.pack . show) $ ans
