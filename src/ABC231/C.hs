@@ -2,6 +2,7 @@ import System.IO ( stdout, hFlush )
 import Control.Monad ( replicateM )
 import Data.Maybe ( fromJust )
 import qualified Data.ByteString.Char8 as BS
+import qualified Data.Heap as H
 
 import Data.List
 
@@ -46,7 +47,10 @@ getIntTuplesAll = map readIntTuple . BS.lines <$> BS.getContents
 main = do
   (n, q) <- getIntTuple
   as <- getIntList
-  let as' = sort as
+  let ah = H.fromList as
   xs <- getIntsN q
-  let ans = [(n -) . fromJust . findIndex (x <=) $ as' | x <- xs]
-  BS.putStr . BS.unlines . map (BS.pack . show) $ ans
+  let ans = map (gtEqCount ah) xs
+  putStr . unlines . map show $ ans
+    where
+      gtEqCount h x = (H.size h - ) . H.size . fst3 . H.split x $ h
+      fst3 (a, _, _) = a
