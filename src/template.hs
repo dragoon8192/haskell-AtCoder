@@ -45,7 +45,7 @@ filterIOBS :: (BS.ByteString -> BS.ByteString) -> IO ()
 filterIOBS f = BS.putStrLn . f =<< BS.getLine
 filterIOInt :: (Integral a, Show b) => (a -> b) -> IO ()
 filterIOInt f = print . f =<< getInt
-filterIOIntsN :: (Integral a, Integral n, Show b) => (a -> b) -> n -> IO ()
-filterIOIntsN f n = do
+filterIOIntsN :: (Integral a, Integral n, Show b) => n -> (a -> b) -> IO ()
+filterIOIntsN n f = do
   replicateM (fromIntegral n) . filterIOInt $ f
   return ()

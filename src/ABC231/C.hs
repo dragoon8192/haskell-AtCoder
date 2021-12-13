@@ -2,7 +2,8 @@ import System.IO ( stdout, hFlush )
 import Control.Monad ( replicateM )
 import Data.Maybe ( fromJust )
 import qualified Data.ByteString.Char8 as BS
-import qualified Data.Heap as H
+import qualified Data.IntSet as IS
+import qualified Data.IntMap as IM
 import qualified Data.Vector as V
 
 import Data.List
@@ -49,16 +50,15 @@ filterIOBS :: (BS.ByteString -> BS.ByteString) -> IO ()
 filterIOBS f = BS.putStrLn . f =<< BS.getLine
 filterIOInt :: (Integral a, Show b) => (a -> b) -> IO ()
 filterIOInt f = print . f =<< getInt
-filterIOIntsN :: (Integral a, Integral n, Show b) => (a -> b) -> n -> IO ()
-filterIOIntsN f n = do
+filterIOIntsN :: (Integral a, Integral n, Show b) => n -> (a -> b) -> IO ()
+filterIOIntsN n f = do
   replicateM (fromIntegral n) . filterIOInt $ f
   return ()
 
 main = do
   (n, q) <- getIntTuple
-  ah <- H.fromList <$> getIntList
-  xv <- V.fromList <$> getIntsN q
-  BS.putStr . BS.unlines . V.toList . V.map (BS.pack . show . gtEqCount ah) $ xv
-    where
-      gtEqCount h x = (H.size h - ) . H.size . fst3 . H.split x $ h
-      fst3 (a, _, _) = a
+  as <- IS.fromList <$> getIntList
+  -- xv <- V.fromList <$> getIntsN q
+  let gtEqCount x = (n -) . IS.size . fst . IS.split x $ as
+  filterIOIntsN q gtEqCount
+  -- BS.putStr . BS.unlines . V.toList . V.map (BS.pack . show . gtEqCount) $ xv
