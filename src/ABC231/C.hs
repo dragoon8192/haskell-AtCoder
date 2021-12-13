@@ -44,13 +44,20 @@ getIntTuplesN n = map readIntTuple <$> getNBSs n
 getIntTuplesAll :: (Integral a) => IO [(a, a)]
 getIntTuplesAll = map readIntTuple . BS.lines <$> BS.getContents
 
+filterIOBS :: (BS.ByteString -> BS.ByteString) -> IO ()
+filterIOBS f = BS.putStrLn . f =<< BS.getLine
+filterIOInt :: (Integral a, Show b) => (a -> b) -> IO ()
+filterIOInt f = print . f =<< getInt
+filterIOIntsN :: (Integral a, Integral n, Show b) => (a -> b) -> n -> IO ()
+filterIOIntsN f n = do
+  replicateM (fromIntegral n) . filterIOInt $ f
+  return ()
+
 main = do
   (n, q) <- getIntTuple
   as <- getIntList
   let ah = H.fromList as
-  xs <- getIntsN q
-  let ans = map (gtEqCount ah) xs
-  putStr . unlines . map show $ ans
+  filterIOIntsN (gtEqCount ah) q
     where
       gtEqCount h x = (H.size h - ) . H.size . fst3 . H.split x $ h
       fst3 (a, _, _) = a
