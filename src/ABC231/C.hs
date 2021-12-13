@@ -3,6 +3,7 @@ import Control.Monad ( replicateM )
 import Data.Maybe ( fromJust )
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Heap as H
+import qualified Data.Vector as V
 
 import Data.List
 
@@ -55,9 +56,9 @@ filterIOIntsN f n = do
 
 main = do
   (n, q) <- getIntTuple
-  as <- getIntList
-  let ah = H.fromList as
-  filterIOIntsN (gtEqCount ah) q
+  ah <- H.fromList <$> getIntList
+  xv <- V.fromList <$> getIntsN q
+  BS.putStr . BS.unlines . V.toList . V.map (BS.pack . show . gtEqCount ah) $ xv
     where
       gtEqCount h x = (H.size h - ) . H.size . fst3 . H.split x $ h
       fst3 (a, _, _) = a
