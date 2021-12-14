@@ -2,11 +2,9 @@ import System.IO ( stdout, hFlush )
 import Control.Monad ( replicateM )
 import Data.Maybe ( fromJust )
 import qualified Data.ByteString.Char8 as BS
-import qualified Data.IntSet as IS
-import qualified Data.IntMap as IM
-import qualified Data.Vector as V
 
 import Data.List
+import qualified Data.IntMap as IM
 
 flush :: IO ()
 flush = hFlush stdout
@@ -22,28 +20,27 @@ readIntTuple = listToTuple . map readInt . BS.words
 readIntList :: (Integral a) => BS.ByteString -> [a]
 readIntList = map readInt . BS.words
 
-getNBSs :: (Integral n) => n -> IO [BS.ByteString]
--- getNBSs n = replicateM (fromIntegral n) BS.getLine
-getNBSs n = take (fromIntegral n) . BS.lines <$> BS.getContents
+getBSsN :: (Integral n) => n -> IO [BS.ByteString]
+getBSsN n = take (fromIntegral n) . BS.lines <$> BS.getContents
 
 getInt :: (Integral a) => IO a
 getInt = readInt <$> BS.getLine
 getIntsN :: (Integral a, Integral n) => n -> IO [a]
-getIntsN n = map readInt <$> getNBSs n
+getIntsN n = map readInt <$> getBSsN n
 getIntsAll :: (Integral a) => IO [a]
 getIntsAll = map readInt . BS.lines <$> BS.getContents
 
 getIntList :: (Integral a) => IO [a]
 getIntList = readIntList <$> BS.getLine
 getIntListsN :: (Integral a, Integral n) => n -> IO [[a]]
-getIntListsN n = map readIntList <$> getNBSs n
+getIntListsN n = map readIntList <$> getBSsN n
 getIntListsAll :: (Integral a) => IO [[a]]
 getIntListsAll = map readIntList . BS.lines <$> BS.getContents
 
 getIntTuple :: (Integral a) => IO (a, a)
 getIntTuple = readIntTuple <$> BS.getLine
 getIntTuplesN :: (Integral a, Integral n) => n -> IO [(a, a)]
-getIntTuplesN n = map readIntTuple <$> getNBSs n
+getIntTuplesN n = map readIntTuple <$> getBSsN n
 getIntTuplesAll :: (Integral a) => IO [(a, a)]
 getIntTuplesAll = map readIntTuple . BS.lines <$> BS.getContents
 
@@ -61,5 +58,5 @@ main = do
   as <- IM.fromListWith (+) . flip zip (repeat 1) <$> getIntList
   let gtEqNums = snd . IM.mapAccum (\acc eqNum -> (acc + eqNum, n - acc)) 0 $ as
   let gtEqCount x = maybe 0 snd . IM.lookupGE x $ gtEqNums
-  xv <- V.fromList <$> getIntsN q
-  putStr . unlines . V.toList . V.map (show . gtEqCount) $ xv
+  xs <- getIntsN q
+  putStr . unlines . map (show . gtEqCount) $ xs
