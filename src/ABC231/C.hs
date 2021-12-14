@@ -46,14 +46,14 @@ getIntTuplesN n = map readIntTuple <$> getNBSs n
 getIntTuplesAll :: (Integral a) => IO [(a, a)]
 getIntTuplesAll = map readIntTuple . BS.lines <$> BS.getContents
 
-filterIOBS :: (BS.ByteString -> BS.ByteString) -> IO ()
-filterIOBS f = BS.putStrLn . f =<< BS.getLine
-filterIOInt :: (Integral a, Show b) => (a -> b) -> IO ()
-filterIOInt f = print . f =<< getInt
-filterIOIntsN :: (Integral a, Integral n, Show b) => n -> (a -> b) -> IO ()
-filterIOIntsN n f = do
-  replicateM (fromIntegral n) . filterIOInt $ f
-  return ()
+-- filterIOBS :: (BS.ByteString -> BS.ByteString) -> IO ()
+-- filterIOBS f = BS.putStrLn . f =<< BS.getLine
+-- filterIOInt :: (Integral a, Show b) => (a -> b) -> IO ()
+-- filterIOInt f = print . f =<< getInt
+-- filterIOIntsN :: (Integral a, Integral n, Show b) => n -> (a -> b) -> IO ()
+-- filterIOIntsN n f = do
+--   replicateM (fromIntegral n) . filterIOInt $ f
+--   return ()
 
 main = do
   (n, q) <- getIntTuple
@@ -61,6 +61,4 @@ main = do
   let gtEqNums = snd . IM.mapAccum (\acc eqNum -> (acc + eqNum, n - acc)) 0 $ as
   let gtEqCount x = maybe 0 snd . IM.lookupGE x $ gtEqNums
   xv <- V.fromList <$> getIntsN q
-  -- filterIOIntsN q gtEqCount
-  -- BS.putStr . BS.unlines . V.toList . V.map (BS.pack . show . gtEqCount) $ xv
   putStr . unlines . V.toList . V.map (show . gtEqCount) $ xv
