@@ -23,7 +23,8 @@ readIntList :: (Integral a) => BS.ByteString -> [a]
 readIntList = map readInt . BS.words
 
 getNBSs :: (Integral n) => n -> IO [BS.ByteString]
-getNBSs n = replicateM (fromIntegral n) BS.getLine
+-- getNBSs n = replicateM (fromIntegral n) BS.getLine
+getNBSs n = take (fromIntegral n) . BS.lines <$> BS.getContents
 
 getInt :: (Integral a) => IO a
 getInt = readInt <$> BS.getLine
