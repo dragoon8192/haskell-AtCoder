@@ -57,8 +57,9 @@ filterIOIntsN n f = do
 
 main = do
   (n, q) <- getIntTuple
-  as <- IS.fromList <$> getIntList
-  -- xv <- V.fromList <$> getIntsN q
-  let gtEqCount x = (n -) . IS.size . fst . IS.split x $ as
-  filterIOIntsN q gtEqCount
-  -- BS.putStr . BS.unlines . V.toList . V.map (BS.pack . show . gtEqCount) $ xv
+  as <- IM.fromListWith (+) . flip zip (repeat 1) <$> getIntList
+  let gtEqNums = snd . IM.mapAccum (\acc eqNum -> (acc + eqNum, n - acc)) 0 $ as
+  let gtEqCount x = maybe 0 snd . IM.lookupGE x $ gtEqNums
+  xv <- V.fromList <$> getIntsN q
+  -- filterIOIntsN q gtEqCount
+  BS.putStr . BS.unlines . V.toList . V.map (BS.pack . show . gtEqCount) $ xv
