@@ -62,4 +62,5 @@ main = do
   let gtEqCount x = maybe 0 snd . IM.lookupGE x $ gtEqNums
   xv <- V.fromList <$> getIntsN q
   -- filterIOIntsN q gtEqCount
-  BS.putStr . BS.unlines . V.toList . V.map (BS.pack . show . gtEqCount) $ xv
+  -- BS.putStr . BS.unlines . V.toList . V.map (BS.pack . show . gtEqCount) $ xv
+  putStr . unlines . V.toList . V.map (show . gtEqCount) $ xv
