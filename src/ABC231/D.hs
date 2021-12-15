@@ -16,7 +16,7 @@ main = do
   let
     calc :: Int -> IS.IntSet -> S.Set (Int, Int) -> Bool
     calc i toEnds abs = if
-      | i >= n || S.null abs ->  True
+      | i > n || S.null abs ->  True
       | sizeIbs >  2  ->  False
       | sizeIbs == 2  ->  if
             | iIsEnd    ->  False
@@ -34,7 +34,7 @@ main = do
         (_, b1) : _ = ib1s
         iIsEnd = IS.member i toEnds
         b0IsEnd = IS.member b0 toEnds
-  putStrLn $ if calc 0 IS.empty abs
+  putStrLn $ if calc 1 IS.empty abs
             then "Yes"
             else "No"
 
