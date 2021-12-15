@@ -16,19 +16,24 @@ main = do
   let
     calc :: Int -> IS.IntSet -> S.Set (Int, Int) -> Bool
     calc i toEnds abs = if
-      | i >= n        -> True
-      | sizeIbs >  2 -> False
-      | sizeIbs == 2 && isEnd     ->  False
-      | sizeIbs == 2 && not isEnd -> calc (i+1) toEnds $ S.insert (b0, b1) abs'
-      | sizeIbs == 1 && isEnd     -> calc (i+1) (IS.insert b0 . IS.delete i $ toEnds) abs'
-      | sizeIbs == 1 && not isEnd -> calc (i+1) (IS.insert b0 toEnds) abs'
+      | i >= n || S.null abs ->  True
+      | sizeIbs >  2  ->  False
+      | sizeIbs == 2  ->  if
+            | iIsEnd    ->  False
+            | b0IsEnd   ->  calc (i+1) (IS.insert b1 . IS.delete b0 $ toEnds) abs'
+            | otherwise ->  calc (i+1) toEnds $ S.insert (b0, b1) abs'
+      | sizeIbs == 1  ->  if
+            | iIsEnd    ->  calc (i+1) (IS.insert b0 . IS.delete i $ toEnds) abs'
+            | b0IsEnd   ->  False
+            | otherwise ->  calc (i+1) (IS.insert b0 toEnds) abs'
       | otherwise     -> calc (i+1) toEnds abs'
       where
         (ibs, abs') = S.split (i, n) abs
         sizeIbs = S.size ibs
         (_, b0) : ib1s = S.toList ibs
         (_, b1) : _ = ib1s
-        isEnd = IS.member i toEnds
+        iIsEnd = IS.member i toEnds
+        b0IsEnd = IS.member b0 toEnds
   putStrLn $ if calc 0 IS.empty abs
             then "Yes"
             else "No"
