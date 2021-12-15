@@ -1,3 +1,4 @@
+{-#LANGUAGE MultiWayIf #-}
 import System.IO ( stdout, hFlush )
 import Control.Monad ( replicateM )
 import Data.Maybe ( fromJust )
@@ -6,22 +7,38 @@ import qualified Data.ByteString.Char8 as BS
 -- /\ my template /\
 --------------------------------
 import Data.List
+import qualified Data.Set as S
+import qualified Data.IntSet as IS
 
 main = do
   (n, m) <- getIntTuple
-  abs <- getIntTuplesN m
-  let xs = permutations [1..n]
-  putStrLn $ if any (allneigh abs) xs
+  abs <- S.fromList <$> getIntTuplesN m
+  let
+    calc :: Int -> IS.IntSet -> S.Set (Int, Int) -> Bool
+    calc i toEnds abs = if
+      | i >= n        -> True
+      | sizeAibs >  2 -> False
+      | sizeAibs == 2 && isEnd     ->  False
+      | sizeAibs == 2 && not isEnd -> calc (i+1) toEnds $ S.insert (b0, b1) abs'
+      | sizeAibs == 1 && isEnd     -> calc (i+1) (IS.insert b0 . IS.delete i $ toEnds) abs'
+      | sizeAibs == 1 && not isEnd -> calc (i+1) (IS.insert b0 toEnds) abs'
+      | otherwise     -> calc (i+1) toEnds abs'
+      where
+        (aibs, abs') = S.split (i, n) abs
+        sizeAibs = S.size aibs
+        (_, b0) : (_, b1) : _ = S.toList aibs
+        isEnd = IS.member i toEnds
+  putStrLn $ if calc 0 IS.empty abs
             then "Yes"
             else "No"
 
-neigh (a, b) (x:y:xs) = ((a == x && b == y) || (a == y && b == x)) || neigh (a, b) (y:xs)
-neigh _ [x] = False
-neigh _ [] = False
-
-allneigh :: [(Integer, Integer)] -> [Integer] -> Bool
-allneigh (ab:abs) xs = neigh ab xs && allneigh abs xs
-allneigh [] _ = True
+-- neigh (a, b) (x:y:xs) = ((a == x && b == y) || (a == y && b == x)) || neigh (a, b) (y:xs)
+-- neigh _ [x] = False
+-- neigh _ [] = False
+--
+-- allneigh :: [(Integer, Integer)] -> [Integer] -> Bool
+-- allneigh (ab:abs) xs = neigh ab xs && allneigh abs xs
+-- allneigh [] _ = True
 
 --------------------------------
 -- \/ my template \/
