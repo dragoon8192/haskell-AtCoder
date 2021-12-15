@@ -28,7 +28,7 @@ main = do
             | otherwise ->  calc (i+1) (IS.insert b0 toEnds) abs'
       | otherwise     -> calc (i+1) toEnds abs'
       where
-        (ibs, abs') = S.split (i, n) abs
+        (ibs, abs') = S.split (i+1, 0) abs
         sizeIbs = S.size ibs
         (_, b0) : ib1s = S.toList ibs
         (_, b1) : _ = ib1s
