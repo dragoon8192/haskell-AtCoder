@@ -16,7 +16,7 @@ main = do
   let
     calc :: Int -> IS.IntSet -> S.Set (Int, Int) -> Bool
     calc i toEnds abs = if
-      | i > n || S.null abs ->  True
+      | i > n || S.null abs' ->  True
       | sizeIbs >  2  ->  False
       | sizeIbs == 2  ->  if
             | iIsEnd    ->  False
