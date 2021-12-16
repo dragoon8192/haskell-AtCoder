@@ -25,7 +25,8 @@ main = do
             | otherwise ->  calc (i+1) toEnds $ S.insert (b0, b1) abs'
       | sizeIbs == 1  ->  if
             | iIsEnd    ->  calc (i+1) (IS.insert b0 . IS.delete i $ toEnds) abs'
-            | b0IsEnd   ->  False
+            | b0IsEnd && S.null abs'  ->  True
+            | b0IsEnd && otherwise  ->  False
             | otherwise ->  calc (i+1) (IS.insert b0 toEnds) abs'
       | otherwise     -> calc (i+1) toEnds abs'
       where
