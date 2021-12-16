@@ -25,20 +25,20 @@ main = do
             else "No"
 
 calc :: Int -> S.Set (Int, NodeOrEnd) -> Bool
-calc i abs = if S.null abs then True
+calc i abs = if S.null abs
+  then True
   else case map snd . S.toList $ ibs of
-  [Node b0]              -> insCalc (b0, End i) (i+1) abs'
-  [Node b0, nb1]         -> insCalc (b0, nb1) (i+1) abs'
-  []                     -> calc (i+1) abs'
-  [End b0]               -> calc (i+1) abs'
-  [End b0, _]            -> calc (i+1) abs'
-  _                      -> False
+    [Node b0]              -> insCalc (b0, End i) (i+1) abs'
+    [Node b0, nb1]         -> insCalc (b0, nb1) (i+1) abs'
+    []                     -> calc (i+1) abs'
+    [End b0]               -> calc (i+1) abs'
+    [End b0, _]            -> calc (i+1) abs'
+    _                      -> False
   where
     (ibs, abs') = S.spanAntitone ((i ==) . fst) abs
-
-insCalc ab i abs = if S.member ab abs
-                  then  False
-                  else calc i $ S.insert ab abs
+    insCalc ab i abs = if S.member ab abs
+      then  False
+      else calc i $ S.insert ab abs
 
 --------------------------------
 -- \/ my template \/
