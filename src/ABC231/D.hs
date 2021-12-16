@@ -21,6 +21,7 @@ main = do
       | sizeIbs == 2  ->  if
             | iIsEnd    ->  False
             | b0IsEnd   ->  calc (i+1) (IS.insert b1 . IS.delete b0 $ toEnds) abs'
+            | b0b1IsLoop->  False
             | otherwise ->  calc (i+1) toEnds $ S.insert (b0, b1) abs'
       | sizeIbs == 1  ->  if
             | iIsEnd    ->  calc (i+1) (IS.insert b0 . IS.delete i $ toEnds) abs'
@@ -34,6 +35,7 @@ main = do
         (_, b1) : _ = ib1s
         iIsEnd = IS.member i toEnds
         b0IsEnd = IS.member b0 toEnds
+        b0b1IsLoop = S.member (b0, b1) abs'
   putStrLn $ if calc 1 IS.empty abs
             then "Yes"
             else "No"
