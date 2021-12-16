@@ -25,13 +25,14 @@ main = do
             else "No"
 
 calc :: Int -> S.Set (Int, NodeOrEnd) -> Bool
-calc i abs = case nb0 of
-  _       | S.null abs   -> True
+calc i abs = if S.null abs
+  then True
+  else case nb0 of
   _       | sizeIbs >  2 -> False
-  Node b0 | sizeIbs == 2 -> calc (i+1) $ S.insert (b0, nb1) abs'
-  Node b0 | sizeIbs == 1 -> calc (i+1) $ S.insert (b0, End i) abs'
-  End  b0 | sizeIbs == 2 -> calc (i+1) abs'
-  End  b0 | sizeIbs == 1 -> calc (i+1) abs'
+  Node b0 | sizeIbs == 2 -> insCalc (b0, nb1) (i+1) abs'
+  Node b0 | sizeIbs == 1 -> insCalc (b0, End i) (i+1) abs'
+  -- End  b0 | sizeIbs == 2 -> calc (i+1) abs'
+  -- End  b0 | sizeIbs == 1 -> calc (i+1) abs'
   _                      -> calc (i+1) abs'
   where
     (ibs, abs') = S.spanAntitone ((i ==) . fst) abs
@@ -39,6 +40,9 @@ calc i abs = case nb0 of
     (_, nb0) : ib1s = S.toList ibs
     (_, nb1) : _ = ib1s
 
+insCalc ab i abs = if S.member ab abs
+                  then  False
+                  else calc i $ S.insert ab abs
 --------------------------------
 -- \/ my template \/
 --------------------------------
