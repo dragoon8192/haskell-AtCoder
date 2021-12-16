@@ -7,39 +7,37 @@ import qualified Data.ByteString.Char8 as BS
 -- /\ my template /\
 --------------------------------
 import Data.List
+import Control.Arrow
 import qualified Data.Set as S
 import qualified Data.IntSet as IS
 
+data NodeOrEnd = Node Int | End Int
+  deriving (Eq, Ord)
+fromNode (Node a) = a
+fromNode _ = undefined
+
 main = do
   (n, m) <- getIntTuple
-  abs <- S.fromList <$> getIntTuplesN m
+  abs <- S.fromList . map (second Node) <$> getIntTuplesN m
   let
-    calc :: Int -> IS.IntSet -> S.Set (Int, Int) -> Bool
-    calc i toEnds abs = if
-      | i > n || S.null abs ->  True
-      | sizeIbs >  2  ->  False
-      | sizeIbs == 2  ->  if
-            | iIsEnd    ->  False
-            | b0IsEnd   ->  calc (i+1) (IS.insert b1 . IS.delete b0 $ toEnds) abs'
-            | b0b1IsLoop->  False
-            | otherwise ->  calc (i+1) toEnds $ S.insert (b0, b1) abs'
-      | sizeIbs == 1  ->  if
-            | iIsEnd    ->  calc (i+1) (IS.insert b0 . IS.delete i $ toEnds) abs'
-            | b0IsEnd && S.null abs'  ->  True
-            | b0IsEnd && otherwise  ->  False
-            | otherwise ->  calc (i+1) (IS.insert b0 toEnds) abs'
-      | otherwise     -> calc (i+1) toEnds abs'
-      where
-        (ibs, abs') = S.split (i+1, 0) abs
-        sizeIbs = S.size ibs
-        (_, b0) : ib1s = S.toList ibs
-        (_, b1) : _ = ib1s
-        iIsEnd = IS.member i toEnds
-        b0IsEnd = IS.member b0 toEnds
-        b0b1IsLoop = S.member (b0, b1) abs'
-  putStrLn $ if calc 1 IS.empty abs
+  putStrLn $ if calc 1 abs
             then "Yes"
             else "No"
+
+calc :: Int -> S.Set (Int, NodeOrEnd) -> Bool
+calc i abs = case nb0 of
+  _       | S.null abs   -> True
+  _       | sizeIbs >  2 -> False
+  Node b0 | sizeIbs == 2 -> calc (i+1) $ S.insert (b0, nb1) abs'
+  Node b0 | sizeIbs == 1 -> calc (i+1) $ S.insert (b0, End i) abs'
+  End  b0 | sizeIbs == 2 -> calc (i+1) abs'
+  End  b0 | sizeIbs == 1 -> calc (i+1) abs'
+  _                      -> calc (i+1) abs'
+  where
+    (ibs, abs') = S.spanAntitone ((i ==) . fst) abs
+    sizeIbs = S.size ibs
+    (_, nb0) : ib1s = S.toList ibs
+    (_, nb1) : _ = ib1s
 
 --------------------------------
 -- \/ my template \/
