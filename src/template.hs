@@ -1,3 +1,4 @@
+{-#LANGUAGE MultiWayIf #-}
 import System.IO ( stdout, hFlush )
 import Control.Monad ( replicateM )
 import Data.Maybe ( fromJust )
