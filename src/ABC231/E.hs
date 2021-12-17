@@ -9,7 +9,7 @@ import qualified Data.ByteString.Char8 as BS
 --------------------------------
 
 main = do
-  (n,x) <- getIntTuple
+  (n,x) <- getIntTuple :: IO (Integer, Integer)
   as <- getIntList
   let bs = ratioList as
   print $ coinNum x bs
