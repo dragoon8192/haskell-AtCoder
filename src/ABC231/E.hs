@@ -26,7 +26,7 @@ coinList y (b0: bs) = c0: coinList y' bs
 coinNum x bs = coinNumFunc (coinList x bs) bs
   where
     coinNumFunc (c0: cs@(c1: cs')) (b0: bs) = if
-      | c0 <= 1 + div b0 2 -> c0 + coinNumFunc cs bs
+      | 2 * c0 <= b0 + 1  -> c0 + coinNumFunc cs bs
       | otherwise      -> (b0 - c0) + coinNumFunc ((c1 + 1): cs') bs
     coinNumFunc (c0:_) [] = c0
     coinNumFunc _ _ = undefined
