@@ -40,6 +40,9 @@ library
       ABC231.C
       ABC231.D
       ABC231.E
+      ABC232.A
+      ABC232.B
+      ABC232.C
       AHC007.A
   other-modules:
       Paths_AtCoder
