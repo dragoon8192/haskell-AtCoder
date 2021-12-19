@@ -23,8 +23,8 @@ main = do
   where
     f perm (c, d) = if pc < pd then (pc, pd) else (pd, pc)
       where
-        pc = perm !! c
-        pd = perm !! d
+        pc = perm !! (c - 1)
+        pd = perm !! (d - 1)
 
 --------------------------------
 -- \/ my template \/
