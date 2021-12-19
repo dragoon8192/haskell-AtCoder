@@ -7,6 +7,11 @@ import qualified Data.ByteString.Char8 as BS
 --------------------------------
 -- /\ my template /\
 --------------------------------
+import Control.Arrow
+import Control.Monad ( join )
+
+data Inf a = NegInf | Finite a | PosInf
+  deriving (Eq, Ord, Show)
 
 main = do
   (n,x) <- getIntTuple :: IO (Integer, Integer)
@@ -18,18 +23,21 @@ ratioList []  = []
 ratioList [_] = []
 ratioList (a0: as@(a1:_)) = div a1 a0 : ratioList as
 
-coinList y []= [y]
-coinList y (b0: bs) = c0: coinList y' bs
+coinList y []= [(y, PosInf)]
+coinList y (b0: bs) = (c0, Finite b0): coinList y' bs
   where
     (y', c0) = divMod y b0
 
-coinNum x bs = coinNumFunc (coinList x bs) bs
+coinNum x bs = foldr coinNumFunc (0, 0) (coinList x bs)
   where
-    coinNumFunc (c0: cs@(c1: cs')) (b0: bs) =
-      min (c0 + coinNumFunc cs bs)
-          ((b0 - c0) + coinNumFunc ((c1 + 1): cs') bs)
-    coinNumFunc (c0:_) [] = c0
-    coinNumFunc _ _ = undefined
+    coinNumFunc :: (Integer, Inf Integer) -> (Integer, Integer) -> (Integer, Integer)
+    coinNumFunc (c, b) =
+      (f (c, b)) &&& (f (c+1, b))
+      where
+        f :: (Integer, Inf Integer) -> (Integer, Integer) -> Integer
+        f (c, Finite b) = (c +) *** ((b - c) +) >>> uncurry min
+        f (c, PosInf) = (c +) . fst
+        f _ = undefined
 
 --------------------------------
 -- \/ my template \/
