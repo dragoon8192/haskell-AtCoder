@@ -11,9 +11,11 @@ import qualified Data.Set as S
 
 main = do
   (n, m) <- getIntTuple
-  abs <- S.fromList <$> getIntTuplesN m
-  cds <- S.fromList <$> getIntTuplesN m
-  let perms = permutations [1..n] :: [[Integer]]
+  abscds <- getIntTuplesAll
+  let (absl, cdsl) = splitAt m abscds
+  let abs = S.fromList absl
+  let cds = S.fromList cdsl
+  let perms = permutations [1..n]
   let ans = [abs == cds' | perm <- perms, let cds' = S.map (f perm) cds]
   putStrLn $ if or ans
     then "Yes"
