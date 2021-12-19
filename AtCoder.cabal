@@ -43,6 +43,7 @@ library
       ABC232.A
       ABC232.B
       ABC232.C
+      ABC232.D
       AHC007.A
   other-modules:
       Paths_AtCoder
