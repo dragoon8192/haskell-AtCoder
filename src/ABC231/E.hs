@@ -28,7 +28,7 @@ coinList y (b0: bs) = (c0, Finite b0): coinList y' bs
   where
     (y', c0) = divMod y b0
 
-coinNum x bs = foldr coinNumFunc (0, 0) (coinList x bs)
+coinNum x bs = fst . foldr coinNumFunc (0, 0) $ coinList x bs
   where
     coinNumFunc :: (Integer, Inf Integer) -> (Integer, Integer) -> (Integer, Integer)
     coinNumFunc (c, b) =
