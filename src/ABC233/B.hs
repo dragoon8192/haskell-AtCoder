@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiWayIf #-}
+
 import System.IO ( stdout, hFlush )
 import Control.Monad ( replicateM )
 import Data.Maybe ( fromJust )
@@ -8,7 +8,11 @@ import qualified Data.ByteString.Char8 as BS
 --------------------------------
 
 main = do
-  putStrLn "Hello, AtCoder!!"
+  (l, r) <- getIntTuple
+  s <- getLine
+  let (s0s1, s2) = splitAt r s
+  let (s0, s1) = splitAt (l-1) s0s1
+  putStrLn $ s0 ++ reverse s1 ++ s2
 
 --------------------------------
 -- \/ my template \/
