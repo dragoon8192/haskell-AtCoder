@@ -20,7 +20,7 @@ flush = hFlush stdout
 {-#INLINE listToTuple #-}
 listToTuple :: (Integral a) => [a] -> (a,a)
 listToTuple (x: y: _) = (x, y)
-listToTuple xs = error $ "listToTuple error: " ++ show (map fromIntegral xs)
+listToTuple xs        = error $ "listToTuple error: " ++ show (map fromIntegral xs)
 
 {-#INLINE readInt #-}
 readInt :: (Integral a) => BS.ByteString -> a
@@ -34,7 +34,8 @@ readIntList = map readInt . BS.words
 
 {-#INLINE getBSsN #-}
 getBSsN :: (Integral n) => n -> IO [BS.ByteString]
-getBSsN n = take (fromIntegral n) . BS.lines <$> BS.getContents
+getBSsN n = replicateM (fromIntegral n) BS.getLine
+-- getBSsN n = take (fromIntegral n) . BS.lines <$> BS.getContents
 
 {-#INLINE getInt #-}
 getInt :: (Integral a) => IO a
