@@ -6,9 +6,14 @@ import qualified Data.ByteString.Char8 as BS
 --------------------------------
 -- /\ my template /\
 --------------------------------
+import Data.List
 
 main = do
-  putStrLn "Hello, AtCoder!!"
+  (n, k) <- getIntTuple
+  as <- getIntList
+  print $ length . filter (==k) . map sum . subseq $ as
+
+subseq = concatMap tails . inits
 
 --------------------------------
 -- \/ my template \/
