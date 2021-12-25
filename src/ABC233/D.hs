@@ -9,11 +9,12 @@ import qualified Data.ByteString.Char8 as BS
 import Data.List
 
 main = do
-  (n, k) <- getIntTuple
-  as <- getIntList
+  (n, k) <- getIntTuple :: IO (Integer,Integer)
+  as <- getIntList :: IO [Integer]
+  print $ subseq as
   print $ length . filter (==k) . map sum . subseq $ as
 
-subseq = concatMap tails . inits
+subseq = concatMap (init . tails) . tail . inits
 
 --------------------------------
 -- \/ my template \/
