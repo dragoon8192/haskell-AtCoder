@@ -8,7 +8,8 @@ import qualified Data.ByteString.Char8 as BS
 --------------------------------
 
 main = do
-  putStrLn "Hello, AtCoder!!"
+  (x, y) <- getIntTuple
+  print $ max 0 $ div ((y-x) + (10 - 1)) 10
 
 --------------------------------
 -- \/ my template \/
