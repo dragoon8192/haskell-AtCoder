@@ -9,8 +9,8 @@ import qualified Data.ByteString.Char8 as BS
 import Data.List
 
 main = do
-  s <- getLine
-  let xs = map read . tail . inits $ s :: [Integer]
+  s <- BS.getLine
+  let xs = map readInt . tail . BS.inits $ s :: [Integer]
   print $ sum xs
 
 --------------------------------
