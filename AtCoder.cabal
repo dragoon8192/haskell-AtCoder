@@ -44,6 +44,10 @@ library
       ABC232.B
       ABC232.C
       ABC232.D
+      ABC233.A
+      ABC233.B
+      ABC233.C
+      ABC233.D
       AHC007.A
   other-modules:
       Paths_AtCoder
