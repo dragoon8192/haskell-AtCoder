@@ -11,7 +11,6 @@ import Data.Maybe
 main = do
   (n, x) <- getIntTuple
   aIJ <- map tail <$> getIntListsAll
-  print $ prodList x aIJ
   print . length $ prodList x aIJ
 
 prodList :: Integer -> [[Integer]] -> [Bool]
