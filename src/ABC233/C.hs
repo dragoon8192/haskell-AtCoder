@@ -6,10 +6,22 @@ import qualified Data.ByteString.Char8 as BS
 --------------------------------
 -- /\ my template /\
 --------------------------------
+import Data.Maybe
 
 main = do
-  putStrLn "Hello, AtCoder!!"
+  (n, x) <- getIntTuple
+  aIJ <- map tail <$> getIntListsAll
+  print $ prodList x aIJ
+  print . length $ prodList x aIJ
 
+prodList :: Integer -> [[Integer]] -> [Bool]
+prodList 1 [] = [True]
+prodList _ [] = []
+prodList x (a0J: aIJ) = concatMap (flip prodList aIJ) . mapMaybe (divMaybe x) $ a0J
+
+divMaybe a b = if mod a b == 0
+  then Just $ div a b
+  else Nothing
 --------------------------------
 -- \/ my template \/
 --------------------------------
