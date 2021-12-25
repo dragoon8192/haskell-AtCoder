@@ -6,14 +6,12 @@ import qualified Data.ByteString.Char8 as BS
 --------------------------------
 -- /\ my template /\
 --------------------------------
+import Data.List
 
 main = do
-  x <- getInt
-  print $ f x
-
-f x = if x >= 10
-    then (x +) . f . div x $ 10
-    else x
+  s <- getLine
+  let xs = map read . tail . inits $ s :: [Integer]
+  print $ sum xs
 
 --------------------------------
 -- \/ my template \/
