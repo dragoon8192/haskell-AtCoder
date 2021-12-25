@@ -1,5 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE MultiWayIf #-}
+
 import Prelude hiding (sum, product)
 import Data.List hiding (sum, product)
 import System.IO ( stdout, hFlush )
@@ -13,10 +13,14 @@ import qualified Data.ByteString.Char8 as BS
 main = do
   (n, k) <- getIntTuple :: IO (Integer,Integer)
   as <- getIntList :: IO [Integer]
-  print $ subseq as
-  print $ length . filter (==k) . map sum . subseq $ as
+  print $ calc k as
 
-subseq = concatMap (init . tails) . tail . inits
+calc k = sum . map (initsSum k) . init . tails
+
+initsSum k (a:as) = if k == a
+  then 1 + initsSum 0 as
+  else initsSum (k-a) as
+initsSum _ [] = 0
 
 --------------------------------
 -- \/ my template \/
