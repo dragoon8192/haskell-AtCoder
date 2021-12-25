@@ -1,4 +1,7 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE MultiWayIf #-}
+import Prelude hiding (sum, product)
+import Data.List hiding (sum, product)
 import System.IO ( stdout, hFlush )
 import Control.Monad ( replicateM )
 import Data.Maybe ( fromJust )
@@ -6,7 +9,6 @@ import qualified Data.ByteString.Char8 as BS
 --------------------------------
 -- /\ my template /\
 --------------------------------
-import Data.List
 
 main = do
   (n, k) <- getIntTuple :: IO (Integer,Integer)
@@ -19,6 +21,21 @@ subseq = concatMap (init . tails) . tail . inits
 --------------------------------
 -- \/ my template \/
 --------------------------------
+-- fixed Prelude
+--------------------------------
+
+{-# INLINE sum #-}
+sum :: (Foldable t, Num a) => t a -> a
+sum = foldr (+) 0
+
+{-# INLINE product #-}
+product :: (Foldable t, Num a) => t a -> a
+product = foldr (*) 0
+
+--------------------------------
+-- IO
+--------------------------------
+
 {-# INLINE flush #-}
 flush :: IO ()
 flush = hFlush stdout
