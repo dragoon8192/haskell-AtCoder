@@ -12,8 +12,22 @@ import qualified Data.ByteString.Char8 as BS
 -- /\ my template /\
 --------------------------------
 
+import qualified Data.IntSet as IS
+
 main = do
-  putStrLn "Hello, AtCoder!!"
+  (n,d) <- getIntTuple
+  as <- getIntList
+  allSet <- IS.fromList [1..n]
+  let bset = IS.difference allSet $ IS.fromList as
+  let es = elemIndices (-1) as
+  let
+    calc :: [Int] -> IS.IntSet -> Integer
+    calc [e]  bset = IS.size . IS.intersection bset $ range
+      where range = IS.fromList [(e - d)..(e + d)]
+    calc (e:es) bset = IS.fold (*) 1 $ IS.map (calc es) . IS.intersection bset $ range
+      where range = IS.fromList [(e - d)..(e + d)]
+  print $ calc es bset
+
 
 --------------------------------
 -- \/ my template \/
