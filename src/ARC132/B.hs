@@ -15,10 +15,11 @@ import qualified Data.ByteString.Char8 as BS
 main = do
   n <- getInt
   (p0:p1:_) <- getIntList
+  let modN x = mod x n
   let calc p0 p1 = if
-            | p1 == p0 + 1        -> min (n - p0 + 1) (p0 - 1 + 2)
+            | p1 == p0 + 1        -> min (modN (n - p0 + 1)) ((p0 - 1) + 2)
             | p0 == n && p1 == 1  -> 1
-            | p1 == p0 - 1        -> min (p0 - 1) (n - p0 + 3)
+            | p1 == p0 - 1        -> min (modN p0 + 1) (n - p0 + 1)
             | p0 == 1 && p1 == n  -> 2
             | otherwise -> error "cant sort!"
   print $ calc p0 p1
