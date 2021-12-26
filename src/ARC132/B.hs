@@ -13,7 +13,15 @@ import qualified Data.ByteString.Char8 as BS
 --------------------------------
 
 main = do
-  putStrLn "Hello, AtCoder!!"
+  n <- getInt
+  (p0:p1:_) <- getIntList
+  let calc p0 p1 = if
+            | p1 == p0 + 1        -> min (n - p0 + 1) (p0 - 1 + 2)
+            | p0 == n && p1 == 1  -> 1
+            | p1 == p0 - 1        -> min (p0 - 1) (n - p0 + 3)
+            | p0 == 1 && p1 == n  -> 2
+            | otherwise -> error "cant sort!"
+  print $ calc p0 p1
 
 --------------------------------
 -- \/ my template \/

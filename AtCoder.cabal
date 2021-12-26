@@ -50,6 +50,9 @@ library
       ABC233.D
       ABC233.E
       AHC007.A
+      ARC132.A
+      ARC132.B
+      ARC132.C
   other-modules:
       Paths_AtCoder
   hs-source-dirs:
