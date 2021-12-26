@@ -11,9 +11,22 @@ import qualified Data.ByteString.Char8 as BS
 --------------------------------
 -- /\ my template /\
 --------------------------------
+import qualified Data.IntMap as IM
 
 main = do
-  putStrLn "Hello, AtCoder!!"
+  n <- getInt
+  uRm <- IM.fromList . zip [1..] <$> getIntList
+  uCm <- IM.fromList . zip [1..] <$> getIntList
+  q <- getInt
+  rcs <- getIntTuplesN q
+  let isBlack :: (Int, Int) -> Bool
+      isBlack (r,c) = (uRm IM.! r) + (uCm IM.! c) > n
+  putStrLn . map (boolToHashDot . isBlack) $ rcs
+
+
+boolToHashDot :: Bool -> Char
+boolToHashDot True = '#'
+boolToHashDot False = '.'
 
 --------------------------------
 -- \/ my template \/
