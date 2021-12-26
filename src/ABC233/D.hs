@@ -6,6 +6,7 @@ import System.IO ( stdout, hFlush )
 import Control.Monad ( replicateM )
 import Data.Maybe ( fromJust )
 import qualified Data.ByteString.Char8 as BS
+
 --------------------------------
 -- /\ my template /\
 --------------------------------
@@ -13,7 +14,8 @@ import qualified Data.ByteString.Char8 as BS
 main = do
   (n, k) <- getIntTuple :: IO (Integer,Integer)
   as <- getIntList :: IO [Integer]
-  print $ calc k as
+  let sums = scanl' (+) 0 as
+  print . length . filter (== k) . diffs $ sums
 
 calc k = sum . map (initsSum k) . init . tails
 
@@ -22,11 +24,14 @@ initsSum k (a:as) = if k == a
   else initsSum (k-a) as
 initsSum _ [] = 0
 
+diffs (a:as) = map (+ (-a)) as ++ diffs as
+diffs [] = []
+
 --------------------------------
 -- \/ my template \/
 --------------------------------
+
 -- fixed Prelude
---------------------------------
 
 {-# INLINE sum #-}
 sum :: (Foldable t, Num a) => t a -> a
@@ -36,9 +41,7 @@ sum = foldr (+) 0
 product :: (Foldable t, Num a) => t a -> a
 product = foldr (*) 0
 
---------------------------------
 -- IO
---------------------------------
 
 {-# INLINE flush #-}
 flush :: IO ()
