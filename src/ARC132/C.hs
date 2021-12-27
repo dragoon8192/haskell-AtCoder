@@ -17,15 +17,16 @@ import qualified Data.IntSet as IS
 main = do
   (n,d) <- getIntTuple
   as <- getIntList
-  allSet <- IS.fromList [1..n]
-  let bset = IS.difference allSet $ IS.fromList as
-  let es = elemIndices (-1) as
+  let allSet = IS.fromList [1..n]
+  let bset   = IS.difference allSet $ IS.fromList as
+  let es     = elemIndices (-1) as
   let
-    calc :: [Int] -> IS.IntSet -> Integer
-    calc [e]  bset = IS.size . IS.intersection bset $ range
-      where range = IS.fromList [(e - d)..(e + d)]
-    calc (e:es) bset = IS.fold (*) 1 $ IS.map (calc es) . IS.intersection bset $ range
-      where range = IS.fromList [(e - d)..(e + d)]
+    range e = IS.fromList [(e - d)..(e + d)]
+    calc :: [Int] -> IS.IntSet -> Int
+    calc [] _        = 1
+    calc [e]  bset   = IS.size . IS.intersection bset $ range e
+    calc (e:es) bset = fromInteger . mod 998244353 . IS.fold ((*) . toInteger) 1
+                      . IS.map (calc es . flip IS.delete bset) . IS.intersection bset $ range e
   print $ calc es bset
 
 
