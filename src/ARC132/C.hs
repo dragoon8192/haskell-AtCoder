@@ -13,21 +13,25 @@ import qualified Data.ByteString.Char8 as BS
 --------------------------------
 
 import qualified Data.IntSet as IS
+import qualified Data.IntMap as IM
 
 main = do
   (n,d) <- getIntTuple
   as <- getIntList
-  let allSet = IS.fromList [1..n]
-  let bset   = IS.difference allSet $ IS.fromList as
-  let es     = elemIndices (-1) as
   let
-    range e = IS.fromList [(e - d)..(e + d)]
-    calc :: [Int] -> IS.IntSet -> Int
-    calc [] _        = 1
-    calc [e]  bset   = IS.size . IS.intersection bset $ range e
-    calc (e:es) bset = fromInteger . mod 998244353 . IS.fold ((*) . toInteger) 1
-                      . IS.map (calc es . flip IS.delete bset) . IS.intersection bset $ range e
-  print $ calc es bset
+    allSet         = IS.fromList [1..n]
+    undicidedList  = IS.toAscList . IS.difference allSet $ IS.fromList as
+    emptyList      = map (+1) . elemIndices (-1) $ as
+  let
+    calc [] []     = 1
+    calc [] _      = 0
+    calc (u:us) es = case es of
+          e: _ | e < u - d  -> 0
+          _                 -> fromInteger . flip mod 998244353 . sum
+                            . map (toInteger . calc us . (++ es1) . flip delete rangeEs) $ rangeEs
+      where
+        (rangeEs, es1) = span (<= u + d) es
+  print $ calc undicidedList emptyList
 
 
 --------------------------------
