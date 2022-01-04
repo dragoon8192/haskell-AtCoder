@@ -12,27 +12,49 @@ import qualified Data.ByteString.Char8 as BS
 -- /\ my template /\
 --------------------------------
 
+import Data.Set (Set)
+import Data.Map.Strict (Map)
+import Data.IntSet (IntSet)
+import Data.IntMap (IntMap)
+import qualified Data.List   as L
+import qualified Data.Set    as S
+import qualified Data.Map.Strict as M
 import qualified Data.IntSet as IS
-import qualified Data.IntMap as IM
+import qualified Data.IntMap.Strict as IM
 
 main = do
   (n,d) <- getIntTuple
-  as <- getIntList
   let
-    allSet         = IS.fromList [1..n]
-    undicidedList  = IS.toAscList . IS.difference allSet $ IS.fromList as
-    emptyList      = map (+1) . elemIndices (-1) $ as
+    toMaybes a = if a == -1
+      then Nothing
+      else Just a
+  as <- toMaybes <$> getIntList
   let
-    calc [] []     = 1
-    calc [] _      = 0
-    calc (u:us) es = case es of
-          e: _ | e < u - d  -> 0
-          _                 -> fromInteger . flip mod 998244353 . sum
-                            . map (toInteger . calc us . (++ es1) . flip delete rangeEs) $ rangeEs
-      where
-        (rangeEs, es1) = span (<= u + d) es
-  print $ calc undicidedList emptyList
-
+    is = [1..n]
+    asis = zip as is
+    set0 = IS.fromList [n-d..n]
+    map0 = M.singleton set0 1
+    -- allSet         = IS.fromList [1..n]
+    -- undicidedList  = IS.toAscList . IS.difference allSet $ IS.fromList as
+    -- emptyList      = map (+1) . elemIndices (-1) $ as
+  let
+    calc :: (Maybe Int, Int) -> Map IntSet Int -> Map IntSet Int
+    calc (ma, i) = M.unionsWith (+) . calcSets (ma, i)
+    calcSets :: (Maybe Int, Int) -> IntSet -> [IntSet]
+    calcSets (ma, i) = case ma of
+      Nothing -> map (addPrev (i - d)) . removes
+      Just a  -> map (addPrev (i - d)) . removeA a
+    addPrev :: Int -> IntSet -> IntSet
+    addPrev x = if x > 1
+      then IS.insert x
+      else id
+    removeA :: Int -> IntSet -> [IntSet]
+    removeA a set = if IS.member a set
+      then [IS.delete a set]
+      else []
+    removes :: IntSet -> [IntSet]
+    removes set = map (flip IS.delete set) . IS.toList $ set
+  print . flip mod 998244353 $ foldr calc map0 asis
 
 --------------------------------
 -- \/ my template \/
