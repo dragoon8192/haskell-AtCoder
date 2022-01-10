@@ -7,6 +7,7 @@ import System.IO ( stdout, hFlush )
 import Control.Monad ( replicateM )
 import Data.Maybe ( fromJust )
 import qualified Data.ByteString.Char8 as BS
+import Debug.Trace
 
 --------------------------------
 -- /\ my template /\
@@ -25,13 +26,13 @@ import qualified Data.IntMap.Strict as IM
 main = do
   (n,d) <- getIntTuple
   let
-    toMaybes a = if a == -1
+    toMaybe a = if a == -1
       then Nothing
       else Just a
-  as <- toMaybes <$> getIntList
+  as <- L.map toMaybe <$> getIntList
   let
     is = [1..n]
-    asis = zip as is
+    asis = zip as is :: [(Maybe Int, Int)]
     set0 = IS.fromList [n-d..n]
     map0 = M.singleton set0 1
     -- allSet         = IS.fromList [1..n]
@@ -39,22 +40,28 @@ main = do
     -- emptyList      = map (+1) . elemIndices (-1) $ as
   let
     calc :: (Maybe Int, Int) -> Map IntSet Int -> Map IntSet Int
-    calc (ma, i) = M.unionsWith (+) . calcSets (ma, i)
-    calcSets :: (Maybe Int, Int) -> IntSet -> [IntSet]
+    calc (ma, i) = traceShowId . M.unionsWith sumMod . M.mapWithKey (innerFunc (ma, i))
+      where
+        sumMod x y = mod (x + y) 998244353
+    innerFunc :: (Maybe Int, Int) -> IntSet -> Int -> Map IntSet Int
+    innerFunc (ma, i) is j = M.fromSet (const j) . calcSets (ma, i) $ is
+    calcSets :: (Maybe Int, Int) -> IntSet -> Set IntSet
     calcSets (ma, i) = case ma of
-      Nothing -> map (addPrev (i - d)) . removes
-      Just a  -> map (addPrev (i - d)) . removeA a
-    addPrev :: Int -> IntSet -> IntSet
-    addPrev x = if x > 1
+      Nothing -> S.map (insertPositiveElem (i - d - 1)) . removes
+      Just a  -> S.map (insertPositiveElem (i - d - 1)) . removeA a
+    insertPositiveElem :: Int -> IntSet -> IntSet
+    insertPositiveElem x = if x > 0
       then IS.insert x
       else id
-    removeA :: Int -> IntSet -> [IntSet]
+    removes :: IntSet -> Set IntSet
+    removes set = S.map (flip IS.delete set)
+                . S.fromAscList . IS.toAscList $ set
+     -- IntSet -> Set Int
+    removeA :: Int -> IntSet -> Set IntSet
     removeA a set = if IS.member a set
-      then [IS.delete a set]
-      else []
-    removes :: IntSet -> [IntSet]
-    removes set = map (flip IS.delete set) . IS.toList $ set
-  print . flip mod 998244353 $ foldr calc map0 asis
+      then S.singleton $ IS.delete a set
+      else S.empty
+  print . maybe 0 snd . M.lookupMin $ L.foldr calc map0 asis
 
 --------------------------------
 -- \/ my template \/
@@ -79,17 +86,17 @@ flush = hFlush stdout
 {-# INLINE listToTuple #-}
 listToTuple :: (Integral a) => [a] -> (a,a)
 listToTuple (x: y: _) = (x, y)
-listToTuple xs        = error $ "listToTuple error: " ++ show (map fromIntegral xs)
+listToTuple xs        = error $ "listToTuple error: " ++ show (L.map fromIntegral xs)
 
 {-# INLINE readInt #-}
 readInt :: (Integral a) => BS.ByteString -> a
 readInt = fromInteger . fst . fromJust . BS.readInteger
 {-# INLINE readIntTuple #-}
 readIntTuple :: (Integral a) => BS.ByteString -> (a, a)
-readIntTuple = listToTuple . map readInt . BS.words
+readIntTuple = listToTuple . L.map readInt . BS.words
 {-# INLINE readIntList #-}
 readIntList :: (Integral a) => BS.ByteString -> [a]
-readIntList = map readInt . BS.words
+readIntList = L.map readInt . BS.words
 
 {-# INLINE getBSsN #-}
 getBSsN :: (Integral n) => n -> IO [BS.ByteString]
@@ -101,20 +108,20 @@ getInt :: (Integral a) => IO a
 getInt = readInt <$> BS.getLine
 {-# INLINE getIntsN #-}
 getIntsN :: (Integral a, Integral n) => n -> IO [a]
-getIntsN n = map readInt <$> getBSsN n
+getIntsN n = L.map readInt <$> getBSsN n
 {-# INLINE getIntsAll #-}
 getIntsAll :: (Integral a) => IO [a]
-getIntsAll = map readInt . BS.lines <$> BS.getContents
+getIntsAll = L.map readInt . BS.lines <$> BS.getContents
 
 {-# INLINE getIntList #-}
 getIntList :: (Integral a) => IO [a]
 getIntList = readIntList <$> BS.getLine
 {-# INLINE getIntListsN #-}
 getIntListsN :: (Integral a, Integral n) => n -> IO [[a]]
-getIntListsN n = map readIntList <$> getBSsN n
+getIntListsN n = L.map readIntList <$> getBSsN n
 {-# INLINE getIntListsAll #-}
 getIntListsAll :: (Integral a) => IO [[a]]
-getIntListsAll = map readIntList . BS.lines <$> BS.getContents
+getIntListsAll = L.map readIntList . BS.lines <$> BS.getContents
 {-# INLINE getIntMatrix #-}
 getIntMatrix = getIntListsAll
 
@@ -123,10 +130,10 @@ getIntTuple :: (Integral a) => IO (a, a)
 getIntTuple = readIntTuple <$> BS.getLine
 {-# INLINE getIntTuplesN #-}
 getIntTuplesN :: (Integral a, Integral n) => n -> IO [(a, a)]
-getIntTuplesN n = map readIntTuple <$> getBSsN n
+getIntTuplesN n = L.map readIntTuple <$> getBSsN n
 {-# INLINE getIntTuplesAll #-}
 getIntTuplesAll :: (Integral a) => IO [(a, a)]
-getIntTuplesAll = map readIntTuple . BS.lines <$> BS.getContents
+getIntTuplesAll = L.map readIntTuple . BS.lines <$> BS.getContents
 
 {-# INLINE printYesNo #-}
 printYesNo :: Bool -> IO ()
