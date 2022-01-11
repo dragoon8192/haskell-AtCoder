@@ -12,6 +12,7 @@ import Debug.Trace
 --------------------------------
 -- /\ my template /\
 --------------------------------
+import Data.Maybe
 
 import Data.Set (Set)
 import Data.Map.Strict (Map)
@@ -35,12 +36,9 @@ main = do
     asis = zip as is :: [(Maybe Int, Int)]
     set0 = IS.fromList [n-d..n]
     map0 = M.singleton set0 1
-    -- allSet         = IS.fromList [1..n]
-    -- undicidedList  = IS.toAscList . IS.difference allSet $ IS.fromList as
-    -- emptyList      = map (+1) . elemIndices (-1) $ as
   let
     calc :: (Maybe Int, Int) -> Map IntSet Int -> Map IntSet Int
-    calc (ma, i) = traceShowId . M.unionsWith sumMod . M.mapWithKey (innerFunc (ma, i))
+    calc (ma, i) = M.unionsWith sumMod . M.mapWithKey (innerFunc (ma, i))
       where
         sumMod x y = mod (x + y) 998244353
     innerFunc :: (Maybe Int, Int) -> IntSet -> Int -> Map IntSet Int
@@ -61,7 +59,7 @@ main = do
     removeA a set = if IS.member a set
       then S.singleton $ IS.delete a set
       else S.empty
-  print . maybe 0 snd . M.lookupMin $ L.foldr calc map0 asis
+  print . fromMaybe 0 . M.lookup IS.empty . L.foldr calc map0 $ asis
 
 --------------------------------
 -- \/ my template \/
