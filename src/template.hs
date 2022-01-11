@@ -1,12 +1,23 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE MultiWayIf #-}
+{-# LANGUAGE NegativeLiterals #-}
+{-# LANGUAGE TupleSections, MultiWayIf #-}
 
 import Prelude hiding (sum, product)
-import Data.List hiding (sum, product)
 import System.IO ( stdout, hFlush )
 import Control.Monad ( replicateM )
 import Data.Maybe ( fromJust )
 import qualified Data.ByteString.Char8 as BS
+
+import Debug.Trace
+import Data.Set (Set)
+import Data.Map.Strict (Map)
+import Data.IntSet (IntSet)
+import Data.IntMap (IntMap)
+import qualified Data.List   as L
+import qualified Data.Set    as S
+import qualified Data.Map.Strict as M
+import qualified Data.IntSet as IS
+import qualified Data.IntMap.Strict as IM
 
 --------------------------------
 -- /\ my template /\
@@ -24,7 +35,6 @@ main = do
 {-# INLINE sum #-}
 sum :: (Foldable t, Num a) => t a -> a
 sum = foldr (+) 0
-
 {-# INLINE product #-}
 product :: (Foldable t, Num a) => t a -> a
 product = foldr (*) 0
