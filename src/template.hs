@@ -8,6 +8,8 @@ import Prelude hiding ( sum, product )
 import System.IO ( stdin, stdout, hFlush )
 import Control.Monad ( replicateM )
 import Data.Maybe ( fromJust )
+import Data.Either ( fromLeft )
+import Data.Bool ( bool )
 import Control.Monad.State
 import Control.Applicative
 import qualified Data.ByteString.Char8 as BS
@@ -47,11 +49,8 @@ parse :: AP.Parser a -> Solver a
 parse parser = do
   result <- AP.parseWith getSome parser =<< get
   case result of
-    AP.Fail _ list errMsg -> error errMsg
-    AP.Partial _          -> error "error: Partial"
-    AP.Done input a       -> do
-      put input
-      return a
+    AP.Done input a -> put input >> return a
+    _               -> error . fromLeft "" . AP.eitherResult $ result
   where
     getSome = lift $ BS.hGetSome stdin 65535
 {-# INLINE parseLine #-}
@@ -84,12 +83,10 @@ string :: AP.Parser BS.ByteString
 string = AP.takeTill AP.isSpace
 {-# INLINE hashDotToBool #-}
 hashDotToBool :: Char -> Bool
-hashDotToBool '#' = True
-hashDotToBool _   = False
+hashDotToBool = (== '#')
 {-# INLINE boolToHashDot #-}
 boolToHashDot :: Bool -> Char
-boolToHashDot True = '#'
-boolToHashDot _    = '.'
+boolToHashDot = bool '#' '.'
 
 -- IO
 {-# INLINE flush #-}
