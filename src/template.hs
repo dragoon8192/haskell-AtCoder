@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE NegativeLiterals #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE TupleSections, MultiWayIf #-}
 -- For template functions.
@@ -12,7 +13,7 @@ import Control.Applicative
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Attoparsec.ByteString.Char8 as AP
 -- For main.
-import Debug.Trace
+import Debug.Trace ()
 import Data.Set (Set)
 import Data.Map.Strict (Map)
 import Data.IntSet (IntSet)
@@ -28,11 +29,9 @@ import qualified Data.IntMap.Strict as IM
 --------------------------------
 
 main = runSolver do
+  -- (m, n) <- parseLine $ spaceSepTuple int int
+  -- as <- parseLinesN n int
   lift $ putStrLn "Hello, AtCoder!!"
-  a <- parseLine $ spaceSepTuple int int
-  lift $ print a
-  -- b <- parseLine $ spaceSepList int
-  -- lift $ print b
 
 --------------------------------
 -- \/ my template \/
@@ -40,7 +39,6 @@ main = runSolver do
 
 -- Solver
 type Solver = StateT BS.ByteString IO
-
 runSolver :: Solver a -> IO a
 runSolver s = evalStateT s BS.empty
 
@@ -59,6 +57,9 @@ parse parser = do
 {-# INLINE parseLine #-}
 parseLine :: AP.Parser a -> Solver a
 parseLine parser = parse $ parser <* AP.endOfLine
+{-# INLINE parseLinesN #-}
+parseLinesN :: (Integral n) => n -> AP.Parser a -> Solver [a]
+parseLinesN n parser = parse . AP.count (fromIntegral n) $ parser <* AP.endOfLine
 {-# INLINE spaceOrTab #-}
 spaceOrTab :: AP.Parser Char
 spaceOrTab = AP.char ' ' <|> AP.char '\t'
@@ -67,69 +68,33 @@ spaceOrTab = AP.char ' ' <|> AP.char '\t'
 spaceSepList :: AP.Parser a -> AP.Parser [a]
 spaceSepList = flip AP.sepBy $ AP.many1 spaceOrTab
 {-# INLINE spaceSepTuple #-}
-spaceSepTuple :: AP.Parser a -> AP.Parser b -> AP.Parser (a,b)
-spaceSepTuple pa pb = (,) <$> pa <* AP.many1 spaceOrTab <*> pb
+spaceSepTuple :: AP.Parser a -> AP.Parser b -> AP.Parser (a, b)
+spaceSepTuple pa pb = (,) <$> pa <* AP.many1 spaceOrTab
+                          <*> pb
+{-# INLINE spaceSepTuple3 #-}
+spaceSepTuple3 :: AP.Parser a -> AP.Parser b -> AP.Parser c -> AP.Parser (a, b, c)
+spaceSepTuple3 pa pb pc = (,,)  <$> pa <* AP.many1 spaceOrTab
+                                <*> pb <* AP.many1 spaceOrTab
+                                <*> pc
 {-# INLINE int #-}
 int :: (Integral a) => AP.Parser a
 int = AP.signed AP.decimal
+{-# INLINE string #-}
+string :: AP.Parser BS.ByteString
+string = AP.takeTill AP.isSpace
+{-# INLINE hashDotToBool #-}
+hashDotToBool :: Char -> Bool
+hashDotToBool '#' = True
+hashDotToBool _   = False
+{-# INLINE boolToHashDot #-}
+boolToHashDot :: Bool -> Char
+boolToHashDot True = '#'
+boolToHashDot _    = '.'
 
 -- IO
 {-# INLINE flush #-}
 flush :: IO ()
 flush = hFlush stdout
-
-{-# INLINE listToTuple #-}
-listToTuple :: (Integral a) => [a] -> (a,a)
-listToTuple (x: y: _) = (x, y)
-listToTuple xs        = error $ "listToTuple error: " ++ show (map fromIntegral xs)
-
-{-# INLINE readInt #-}
-readInt :: (Integral a) => BS.ByteString -> a
-readInt = fromInteger . fst . fromJust . BS.readInteger
-{-# INLINE readIntTuple #-}
-readIntTuple :: (Integral a) => BS.ByteString -> (a, a)
-readIntTuple = listToTuple . map readInt . BS.words
-{-# INLINE readIntList #-}
-readIntList :: (Integral a) => BS.ByteString -> [a]
-readIntList = map readInt . BS.words
-
-{-# INLINE getBSsN #-}
-getBSsN :: (Integral n) => n -> IO [BS.ByteString]
-getBSsN n = replicateM (fromIntegral n) BS.getLine
--- getBSsN n = take (fromIntegral n) . BS.lines <$> BS.getContents
-
-{-# INLINE getInt #-}
-getInt :: (Integral a) => IO a
-getInt = readInt <$> BS.getLine
-{-# INLINE getIntsN #-}
-getIntsN :: (Integral a, Integral n) => n -> IO [a]
-getIntsN n = map readInt <$> getBSsN n
-{-# INLINE getIntsAll #-}
-getIntsAll :: (Integral a) => IO [a]
-getIntsAll = map readInt . BS.lines <$> BS.getContents
-
-{-# INLINE getIntList #-}
-getIntList :: (Integral a) => IO [a]
-getIntList = readIntList <$> BS.getLine
-{-# INLINE getIntListsN #-}
-getIntListsN :: (Integral a, Integral n) => n -> IO [[a]]
-getIntListsN n = map readIntList <$> getBSsN n
-{-# INLINE getIntListsAll #-}
-getIntListsAll :: (Integral a) => IO [[a]]
-getIntListsAll = map readIntList . BS.lines <$> BS.getContents
-{-# INLINE getIntMatrix #-}
-getIntMatrix = getIntListsAll
-
-{-# INLINE getIntTuple #-}
-getIntTuple :: (Integral a) => IO (a, a)
-getIntTuple = readIntTuple <$> BS.getLine
-{-# INLINE getIntTuplesN #-}
-getIntTuplesN :: (Integral a, Integral n) => n -> IO [(a, a)]
-getIntTuplesN n = map readIntTuple <$> getBSsN n
-{-# INLINE getIntTuplesAll #-}
-getIntTuplesAll :: (Integral a) => IO [(a, a)]
-getIntTuplesAll = map readIntTuple . BS.lines <$> BS.getContents
-
 {-# INLINE printYesNo #-}
 printYesNo :: Bool -> IO ()
 printYesNo bool = print $ if bool then "Yes" else "No"
