@@ -34,9 +34,15 @@ import qualified Data.IntMap.Strict as IM
 
 main :: IO ()
 main = runSolver do
-  -- (m, n) <- parseLine $ spaceSepTuple int int
-  -- as <- parseLinesN n int
-  lift $ putStrLn "Hello, AtCoder!!"
+  n <- parseLine int
+  hs <- parseLine $ spaceSepList int
+  lift $ print . calc $ hs
+    where
+      calc (a: b: cs) = if a < b
+        then calc (b: cs)
+        else a
+      calc [a] = a
+      calc [] = undefined
 
 --------------------------------
 -- \/ my template \/

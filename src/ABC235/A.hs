@@ -1,7 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE NegativeLiterals, OverloadedStrings #-}
 {-# LANGUAGE BlockArguments #-}
-{-# LANGUAGE TupleSections, MultiWayIf #-}
+
 
 -- For template functions.
 import Prelude hiding ( sum, product )
@@ -34,9 +34,8 @@ import qualified Data.IntMap.Strict as IM
 
 main :: IO ()
 main = runSolver do
-  -- (m, n) <- parseLine $ spaceSepTuple int int
-  -- as <- parseLinesN n int
-  lift $ putStrLn "Hello, AtCoder!!"
+  abc <- BS.unpack <$> parseLine string
+  lift $ print . (`div` 2) . sum . map read . L.permutations $ abc
 
 --------------------------------
 -- \/ my template \/

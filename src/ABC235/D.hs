@@ -1,7 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE NegativeLiterals, OverloadedStrings #-}
 {-# LANGUAGE BlockArguments #-}
-{-# LANGUAGE TupleSections, MultiWayIf #-}
+
 
 -- For template functions.
 import Prelude hiding ( sum, product )
@@ -17,17 +17,17 @@ import qualified Data.ByteString.Char8            as BS
 import qualified Data.Attoparsec.ByteString.Char8 as AP
 
 -- For main.
+import Data.Maybe
 import Debug.Trace
 import Data.Set        (Set)
 import Data.Map.Strict (Map)
 import Data.IntSet     (IntSet)
 import Data.IntMap     (IntMap)
-import qualified Data.List           as L
-import qualified Data.Set            as S
-import qualified Data.Map.Strict     as M
-import qualified Data.IntSet         as IS
-import qualified Data.IntMap.Strict  as IM
-import qualified Data.Vector.Unboxed as UV
+import qualified Data.List          as L
+import qualified Data.Set           as S
+import qualified Data.Map.Strict    as M
+import qualified Data.IntSet        as IS
+import qualified Data.IntMap.Strict as IM
 
 --------------------------------
 -- /\ my template /\
@@ -35,17 +35,26 @@ import qualified Data.Vector.Unboxed as UV
 
 main :: IO ()
 main = runSolver do
-  (n, q) <- parseLine $ spaceSepTuple int int
-  as <- parseLine $ spaceSepList int
-  let va = UV.fromList as
-  xks <- parseLinesN q $ spaceSepTuple int int
-  let vxk = UV.fromList xks :: UV.Vector (Int,Int)
-  lift . putStr . unlines . map show . UV.toList . UV.map (calc va n) $ vxk
-
-calc va n (x, k) =
-  case UV.elemIndices x va UV.!? (k - 1) of
-    Just i -> i + 1
-    Nothing -> -1
+  (a, n) <- parseLine $ spaceSepTuple int int
+  let
+    stepA y = if mod y a == 0
+      then Just $ div y a
+      else Nothing
+    stepB y =
+      let
+        l = length . show $ y
+        (a0, y') = divMod y $ 10^(l - 1)
+        (a1, b)  = divMod y' $ 10^(l - 2)
+      in
+      if l >= 2 && a1 >= 1
+      then Just $ 10 * y' + a0
+      else Nothing
+    step y = maybeToList (stepA y) ++ maybeToList (stepB y)
+    calc n [] = -1
+    calc n ys = if L.elem 1 ys
+      then n
+      else calc (n+1) $ L.concatMap step ys
+  lift $ print $ calc 0 [n]
 
 --------------------------------
 -- \/ my template \/
