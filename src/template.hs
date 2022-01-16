@@ -4,33 +4,36 @@
 {-# LANGUAGE TupleSections, MultiWayIf #-}
 
 -- For template functions.
+
 import Prelude hiding ( sum, product )
 import System.IO ( stdin, stdout, hFlush )
 import Data.Maybe ( fromJust )
 import Data.Either ( fromLeft )
 import Data.Bool ( bool )
 import Control.Monad ( replicateM )
-import Control.Monad.State
-    ( MonadTrans(lift), StateT, MonadState(put, get), evalStateT )
+import Control.Monad.State ( MonadTrans(lift), StateT, MonadState(put, get), evalStateT )
 import Control.Applicative ( Alternative((<|>)) )
 import qualified Data.ByteString.Char8            as BS
 import qualified Data.Attoparsec.ByteString.Char8 as AP
 
 -- For main.
-import Debug.Trace ()
-import Data.Set        (Set)
-import Data.Map.Strict (Map)
-import Data.IntSet     (IntSet)
-import Data.IntMap     (IntMap)
-import qualified Data.List          as L
-import qualified Data.Set           as S
-import qualified Data.Map.Strict    as M
-import qualified Data.IntSet        as IS
-import qualified Data.IntMap.Strict as IM
 
---------------------------------
+import Debug.Trace
+import Data.Maybe
+import Data.Set            ( Set )
+import Data.Map.Strict     ( Map )
+import Data.IntSet         ( IntSet )
+import Data.IntMap         ( IntMap )
+import Data.Vector.Unboxed ( Vector )
+
+import qualified Data.List           as L
+import qualified Data.Set            as S
+import qualified Data.Map.Strict     as M
+import qualified Data.IntSet         as IS
+import qualified Data.IntMap.Strict  as IM
+import qualified Data.Vector.Unboxed as UV
+
 -- /\ my template /\
---------------------------------
 
 main :: IO ()
 main = runSolver do
@@ -38,17 +41,17 @@ main = runSolver do
   -- as <- parseLinesN n int
   lift $ putStrLn "Hello, AtCoder!!"
 
---------------------------------
 -- \/ my template \/
---------------------------------
 
 -- Solver
+
 type Solver = StateT BS.ByteString IO
 
 runSolver :: Solver a -> IO a
 runSolver s = evalStateT s BS.empty
 
 -- Parser
+
 parse :: AP.Parser a -> Solver a
 parse parser = do
   result <- AP.parseWith getSome parser =<< get
