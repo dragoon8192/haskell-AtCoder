@@ -24,6 +24,7 @@ import qualified Data.Vector.Unboxed as UV
 -- For main.
 
 import Debug.Trace
+import Data.Tuple
 import Data.Maybe
 import Data.Set            ( Set )
 import Data.Map.Strict     ( Map )
@@ -40,11 +41,16 @@ import qualified Data.IntMap.Strict  as IM
 
 main :: IO ()
 main = runSolver do
-  -- (m, n) :: (Int, Int) <- parseLine
-  -- as :: [Int] <- parseLinesN n
-  -- liftIO $ print (m, n)
-  -- liftIO $ print as
-  lift $ putStrLn "Hello, AtCoder!!"
+  n :: Int <- parseLine
+  as :: [Int] <- parseLine
+  let
+    d = func as
+    func (a: b: cs) = if a > b
+      then a
+      else func (b : cs)
+    func [a] = a
+    func [] = 0
+  lift $ putStrLn . unwords . L.map show . filter (/= d) $ as
 
 -- \/ my template \/
 

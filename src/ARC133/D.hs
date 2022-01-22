@@ -36,16 +36,25 @@ import qualified Data.Map.Strict     as M
 import qualified Data.IntSet         as IS
 import qualified Data.IntMap.Strict  as IM
 
+import Data.Bits
+
 -- /\ my template /\
 
 main :: IO ()
 main = runSolver do
-  -- (m, n) :: (Int, Int) <- parseLine
-  -- as :: [Int] <- parseLinesN n
-  -- liftIO $ print (m, n)
-  -- liftIO $ print as
-  lift $ putStrLn "Hello, AtCoder!!"
+  (l, r, v) :: (Int, Int, Int) <- parseLine
+  let vect = UV.fromList $ L.map xorSum [l - 1..r]
+  let len = r - l + 2
+  let xy = [(x , y) | x <- [0..len - 1], y <- [x + 1..len - 1]]
+  let anss = UV.filter((== v) . uncurry xor) $ UV.fromList xy
+  liftIO $ print $ flip mod 998244353 . UV.length $ anss
 
+xorSum x = case mod x 4 of
+  0 -> x
+  1 -> 1
+  2 -> x + 1
+  3 -> 0
+  _ -> 0
 -- \/ my template \/
 
 -- Solver

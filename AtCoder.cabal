@@ -57,6 +57,10 @@ library
       ARC132.A
       ARC132.B
       ARC132.C
+      ARC133.A
+      ARC133.B
+      ARC133.C
+      ARC133.D
   other-modules:
       Paths_AtCoder
   hs-source-dirs:

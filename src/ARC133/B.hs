@@ -40,7 +40,9 @@ import qualified Data.IntMap.Strict  as IM
 
 main :: IO ()
 main = runSolver do
-  -- (m, n) :: (Int, Int) <- parseLine
+  n :: Int <- parseLine
+  ps :: [Int] <- parseLine
+  qs :: [Int] <- parseLine
   -- as :: [Int] <- parseLinesN n
   -- liftIO $ print (m, n)
   -- liftIO $ print as
