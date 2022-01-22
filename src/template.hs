@@ -45,6 +45,7 @@ main = runSolver do
   -- lift $ putStrLn "Hello, AtCoder!!"
   a :: UV.Vector Int <- parseLineWithN 3
   liftIO $ print a
+  liftIO $ printUnlinesUVector a
 
 -- \/ my template \/
 
@@ -179,6 +180,18 @@ printYesNo bool = print $ if bool then "Yes" else "No"
 {-# INLINE printYESNO #-}
 printYESNO :: Bool -> IO ()
 printYESNO bool = print $ if bool then "YES" else "NO"
+
+printUnwordsVector :: (Show a) => V.Vector a -> IO ()
+printUnwordsVector = putStr . unwords . V.toList . V.map show
+
+printUnwordsUVector :: (Show a, UV.Unbox a) => UV.Vector a -> IO ()
+printUnwordsUVector = putStr . unwords . map show . UV.toList
+
+printUnlinesVector :: (Show a) => V.Vector a -> IO ()
+printUnlinesVector = putStr . unlines . V.toList . V.map show
+
+printUnlinesUVector :: (Show a, UV.Unbox a) => UV.Vector a -> IO ()
+printUnlinesUVector = putStr . unlines . map show . UV.toList
 
 -- fixed Prelude
 
