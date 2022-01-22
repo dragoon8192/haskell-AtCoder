@@ -40,12 +40,11 @@ import qualified Data.IntMap.Strict  as IM
 
 main :: IO ()
 main = runSolver do
-  -- (m, n) <- parseLine
-  -- as <- parseLinesN n
-  -- lift $ putStrLn "Hello, AtCoder!!"
-  a :: UV.Vector Int <- parseLineWithN 3
-  liftIO $ print a
-  liftIO $ printUnlinesUVector a
+  -- (m, n) :: (Int, Int) <- parseLine
+  -- as :: [Int] <- parseLinesN n
+  -- liftIO $ print (m, n)
+  -- liftIO $ print as
+  lift $ putStrLn "Hello, AtCoder!!"
 
 -- \/ my template \/
 
