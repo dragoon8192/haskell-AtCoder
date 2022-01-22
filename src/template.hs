@@ -181,15 +181,19 @@ printYesNo bool = print $ if bool then "Yes" else "No"
 printYESNO :: Bool -> IO ()
 printYESNO bool = print $ if bool then "YES" else "NO"
 
+{-# INLINE printUnwordsVector #-}
 printUnwordsVector :: (Show a) => V.Vector a -> IO ()
 printUnwordsVector = putStr . unwords . V.toList . V.map show
 
+{-# INLINE printUnwordsUVector #-}
 printUnwordsUVector :: (Show a, UV.Unbox a) => UV.Vector a -> IO ()
 printUnwordsUVector = putStr . unwords . map show . UV.toList
 
+{-# INLINE printUnlinesVector #-}
 printUnlinesVector :: (Show a) => V.Vector a -> IO ()
 printUnlinesVector = putStr . unlines . V.toList . V.map show
 
+{-# INLINE printUnlinesUVector #-}
 printUnlinesUVector :: (Show a, UV.Unbox a) => UV.Vector a -> IO ()
 printUnlinesUVector = putStr . unlines . map show . UV.toList
 
