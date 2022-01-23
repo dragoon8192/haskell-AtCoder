@@ -41,10 +41,16 @@ import qualified Data.IntMap.Strict  as IM
 
 main :: IO ()
 main = runSolver do
-  -- (m, n) :: (Int, Int) <- parseLine
+  str :: String <- BS.unpack <$> parseLine
+  (a, b) :: (Int, Int) <- parseLine
   -- as :: [Int] <- parseLinesN n
-  -- liftIO $ print (m, n)
-  liftIO $ putStrLn "Hello, AtCoder!!"
+  liftIO $ putStrLn $ strSwp (a - 1) (b - 1) str
+
+strSwp 0 j (c0: cs) = cj: cs1 ++ c0 : cs2
+  where
+    (cs1, cj:cs2) = L.splitAt (j - 1) cs
+strSwp i j (c: cs) = c : strSwp (i - 1) (j - 1) cs
+strSwp _ _ _ = undefined
 
 -- \/ my template \/
 
@@ -174,11 +180,11 @@ flush = hFlush stdout
 
 {-# INLINE printYesNo #-}
 printYesNo :: Bool -> IO ()
-printYesNo bool = putStrLn $ if bool then "Yes" else "No"
+printYesNo bool = print $ if bool then "Yes" else "No"
 
 {-# INLINE printYESNO #-}
 printYESNO :: Bool -> IO ()
-printYESNO bool = putStrLn $ if bool then "YES" else "NO"
+printYESNO bool = print $ if bool then "YES" else "NO"
 
 {-# INLINE printUnwordsVector #-}
 printUnwordsVector :: (Show a) => V.Vector a -> IO ()

@@ -41,10 +41,16 @@ import qualified Data.IntMap.Strict  as IM
 
 main :: IO ()
 main = runSolver do
-  -- (m, n) :: (Int, Int) <- parseLine
-  -- as :: [Int] <- parseLinesN n
+  (n, m) :: (Int, Int) <- parseLine
+  strSs :: [ByteString] <- parseLine
+  strTs :: [ByteString] <- parseLine
   -- liftIO $ print (m, n)
-  liftIO $ putStrLn "Hello, AtCoder!!"
+  liftIO $ sequence_ $ map printYesNo $ train strSs strTs
+
+train (s: ss) (t: ts) = if s == t
+  then True : train ss ts
+  else False : train ss (t: ts)
+train _ _ = []
 
 -- \/ my template \/
 

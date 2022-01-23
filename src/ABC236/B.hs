@@ -41,10 +41,12 @@ import qualified Data.IntMap.Strict  as IM
 
 main :: IO ()
 main = runSolver do
-  -- (m, n) :: (Int, Int) <- parseLine
-  -- as :: [Int] <- parseLinesN n
-  -- liftIO $ print (m, n)
-  liftIO $ putStrLn "Hello, AtCoder!!"
+  n :: Int <- parseLine
+  as :: [Int] <- parseLine
+  let map = IM.fromListWith (+) $ zip as $ repeat 1
+  let set = S.fromList . L.map swap . IM.toList $ map
+  let ans = snd $ S.findMin set
+  liftIO $ print ans
 
 -- \/ my template \/
 
@@ -174,11 +176,11 @@ flush = hFlush stdout
 
 {-# INLINE printYesNo #-}
 printYesNo :: Bool -> IO ()
-printYesNo bool = putStrLn $ if bool then "Yes" else "No"
+printYesNo bool = print $ if bool then "Yes" else "No"
 
 {-# INLINE printYESNO #-}
 printYESNO :: Bool -> IO ()
-printYESNO bool = putStrLn $ if bool then "YES" else "NO"
+printYESNO bool = print $ if bool then "YES" else "NO"
 
 {-# INLINE printUnwordsVector #-}
 printUnwordsVector :: (Show a) => V.Vector a -> IO ()

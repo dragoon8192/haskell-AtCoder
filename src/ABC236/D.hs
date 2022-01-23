@@ -41,12 +41,25 @@ import qualified Data.IntMap.Strict  as IM
 
 main :: IO ()
 main = runSolver do
-  -- (m, n) :: (Int, Int) <- parseLine
+  n :: Int <- parseLine
+  mat :: [[Int]] <- parseLinesN (2 * n - 1)
+  let mat2 = triangleToSquare mat
+  let matV = V.map V.fromList . V.fromList $ mat2
+  let pairs = pairGen [0..2 * n - 1]
   -- as :: [Int] <- parseLinesN n
   -- liftIO $ print (m, n)
-  liftIO $ putStrLn "Hello, AtCoder!!"
+  liftIO $ print pairs
+
+triangleToSquare (a0: as) = (0: a0) : (L.zipWith (:) a0 (triangleToSquare as))
+triangleToSquare [] = [[0]]
+
+pairGen (a : as) = L.concatMap (\b -> L.map ((a, b) :) $ pairGen (L.delete b as) ) as
+pairGen [] = [[]]
+
+func (a,b) vv = (vv V.! a) V.! b
 
 -- \/ my template \/
+--
 
 -- Solver
 
