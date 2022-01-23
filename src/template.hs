@@ -44,7 +44,8 @@ main = runSolver do
   -- (m, n) :: (Int, Int) <- parseLine
   -- as :: [Int] <- parseLinesN n
   -- liftIO $ print (m, n)
-  lift $ putStrLn "Hello, AtCoder!!"
+  liftIO $ putStrLn "Hello, AtCoder!!"
+  liftIO $ print $ factVectN 5
 
 -- \/ my template \/
 
@@ -204,6 +205,10 @@ exGcd a b = (g, y, x - d * y)
   where
     (d, m) = divMod a b
     (g, x, y) = exGcd b m
+  -- 拡張Euclidの互除法
+  -- a * x + b * y == gcd a b
+
+factVectN n = UV.prescanl (*) 1 $ UV.generate (n+1) (+1)
 
 -- fixed Prelude
 
