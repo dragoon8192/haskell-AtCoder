@@ -15,6 +15,8 @@ import Data.Bool ( bool )
 import Control.Monad ( replicateM )
 import Control.Monad.State ( MonadTrans(lift), StateT, MonadState(put, get), evalStateT, liftIO )
 import Control.Applicative ( Alternative((<|>)) )
+import Control.Arrow ( first, second )
+import Data.Tuple ( swap )
 import Data.ByteString.Char8 ( ByteString )
 import qualified Data.ByteString.Char8            as BS
 import qualified Data.Attoparsec.ByteString.Char8 as AP
@@ -29,7 +31,6 @@ import Data.Set            ( Set )
 import Data.Map.Strict     ( Map )
 import Data.IntSet         ( IntSet )
 import Data.IntMap         ( IntMap )
-
 import qualified Data.List           as L
 import qualified Data.Set            as S
 import qualified Data.Map.Strict     as M
@@ -43,7 +44,6 @@ main = runSolver do
   -- (m, n) :: (Int, Int) <- parseLine
   -- as :: [Int] <- parseLinesN n
   -- liftIO $ print (m, n)
-  -- liftIO $ print as
   lift $ putStrLn "Hello, AtCoder!!"
 
 -- \/ my template \/
@@ -195,6 +195,15 @@ printUnlinesVector = putStr . unlines . V.toList . V.map show
 {-# INLINE printUnlinesUVector #-}
 printUnlinesUVector :: (Show a, UV.Unbox a) => UV.Vector a -> IO ()
 printUnlinesUVector = putStr . unlines . map show . UV.toList
+
+-- calculation
+
+exGcd :: (Integral a) => a -> a -> (a, a, a)
+exGcd a 0 = (a, 1, 0)
+exGcd a b = (g, y, x - d * y)
+  where
+    (d, m) = divMod a b
+    (g, x, y) = exGcd b m
 
 -- fixed Prelude
 
