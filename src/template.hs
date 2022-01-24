@@ -66,34 +66,6 @@ parse parser = do
   where
     getSome = lift $ BS.hGetSome stdin 65535
 
-class LinesParseableN a where
-  parseLinesN' :: Int -> Solver a
-  {-# INLINE parseLinesN #-}
-  parseLinesN :: (Integral n) => n -> Solver a
-  parseLinesN = parseLinesN' . fromIntegral
-
-class LinesParseableNM m where
-  parseLinesNM' :: (LineParseable a) => Int -> Solver (m a)
-  {-# INLINE parseLinesNM #-}
-  parseLinesNM :: (LineParseable a, Integral n) => n -> Solver (m a)
-  parseLinesNM = parseLinesNM' . fromIntegral
-
-instance {-# OVERLAPS #-} (LineParseable a, LinesParseableNM m) => LinesParseableN (m a) where
-  {-# INLINE parseLinesN' #-}
-  parseLinesN' = parseLinesNM'
-
-instance {-# OVERLAPS #-} LinesParseableNM [] where
-  {-# INLINE parseLinesNM' #-}
-  parseLinesNM' n = AP.count n parseLine
-
-instance {-# OVERLAPS #-} LinesParseableNM V.Vector where
-  {-# INLINE parseLinesNM' #-}
-  parseLinesNM' n = V.replicateM n parseLine
-
-instance {-# OVERLAPS #-} (LineParseable a, UV.Unbox a) => LinesParseableN (UV.Vector a) where
-  {-# INLINE parseLinesN' #-}
-  parseLinesN' n = UV.replicateM n parseLine
-
 class ParseableElement a where
   parser :: AP.Parser a
 
@@ -130,11 +102,6 @@ instance (ParseableElement a, ParseableElement b, ParseableElement c) => LinePar
                       <*> parser <* AP.many1 spaceOrTab
                       <*> parser <* AP.endOfLine
 
-{-# INLINE spaceOrTab #-}
-spaceOrTab :: AP.Parser Char
-spaceOrTab = AP.char ' ' <|> AP.char '\t'
-  -- AP.space は \n も含む
-
 class LineParseableWithN a where
   lineParserWithN' :: Int -> AP.Parser a
   {-# INLINE lineParserWithN #-}
@@ -155,6 +122,39 @@ instance (ParseableElement a) => LineParseableWithN (V.Vector a) where
 instance (ParseableElement a, UV.Unbox a) => LineParseableWithN (UV.Vector a) where
   {-# INLINE lineParserWithN' #-}
   lineParserWithN' n = UV.replicateM n (parser <* (AP.many1 spaceOrTab <|> pure [])) <* AP.endOfLine
+
+class LinesParseableN a where
+  parseLinesN' :: Int -> Solver a
+  {-# INLINE parseLinesN #-}
+  parseLinesN :: (Integral n) => n -> Solver a
+  parseLinesN = parseLinesN' . fromIntegral
+
+class LinesParseableNM m where
+  parseLinesNM' :: (LineParseable a) => Int -> Solver (m a)
+  {-# INLINE parseLinesNM #-}
+  parseLinesNM :: (LineParseable a, Integral n) => n -> Solver (m a)
+  parseLinesNM = parseLinesNM' . fromIntegral
+
+instance {-# OVERLAPS #-} (LineParseable a, LinesParseableNM m) => LinesParseableN (m a) where
+  {-# INLINE parseLinesN' #-}
+  parseLinesN' = parseLinesNM'
+
+instance {-# OVERLAPS #-} LinesParseableNM [] where
+  {-# INLINE parseLinesNM' #-}
+  parseLinesNM' n = AP.count n parseLine
+
+instance {-# OVERLAPS #-} LinesParseableNM V.Vector where
+  {-# INLINE parseLinesNM' #-}
+  parseLinesNM' n = V.replicateM n parseLine
+
+instance {-# OVERLAPS #-} (LineParseable a, UV.Unbox a) => LinesParseableN (UV.Vector a) where
+  {-# INLINE parseLinesN' #-}
+  parseLinesN' n = UV.replicateM n parseLine
+
+{-# INLINE spaceOrTab #-}
+spaceOrTab :: AP.Parser Char
+spaceOrTab = AP.char ' ' <|> AP.char '\t'
+  -- AP.space は \n も含む
 
 -- '#', '.' <-> True, False
 
