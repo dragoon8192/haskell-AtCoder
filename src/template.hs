@@ -73,6 +73,10 @@ instance ParseableElement BS.ByteString where
   {-# INLINE parser #-}
   parser = AP.takeTill AP.isSpace
 
+instance ParseableElement String where
+  {-# INLINE parser #-}
+  parser = BS.unpack <$> AP.takeTill AP.isSpace
+
 instance {-# OVERLAPS #-} (Integral a) => ParseableElement a where
   {-# INLINE parser #-}
   parser = AP.signed AP.decimal
