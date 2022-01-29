@@ -65,6 +65,9 @@ library
       ARC133.B
       ARC133.C
       ARC133.D
+      ARC134.A
+      ARC134.B
+      ARC134.C
   other-modules:
       Paths_AtCoder
   hs-source-dirs:
