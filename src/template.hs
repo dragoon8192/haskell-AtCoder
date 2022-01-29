@@ -1,3 +1,5 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE AllowAmbiguousTypes, TypeApplications #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE NegativeLiterals, OverloadedStrings #-}
@@ -41,9 +43,9 @@ import qualified Data.IntMap.Strict  as IM
 
 main :: IO ()
 main = runSolver do
+  -- n :: Int <- parseLine
   -- (m, n) :: (Int, Int) <- parseLine
-  -- as :: [Int] <- parseLinesN n
-  -- liftIO $ print (m, n)
+  -- as :: [Int] <- parseLine
   liftIO $ putStrLn "Hello, AtCoder!!"
 
 -- \/ my template \/
@@ -211,7 +213,44 @@ exGcd a b = (g, y, x - d * y)
   -- 拡張Euclidの互除法
   -- a * x + b * y == gcd a b
 
-factVectN n = UV.prescanl (*) 1 $ UV.generate (n+1) (+1)
+class IntMod a where
+  prime :: Int
+  toIntMod :: Int -> a
+  fromIntMod :: a -> Int
+
+instance {-# OVERLAPS #-} (IntMod a) => Num a where
+  {-# INLINE fromInteger #-}
+  fromInteger = toIntMod . fromInteger
+  x + y = toIntMod $ fromIntMod x + fromIntMod y
+  x * y = fromInteger $ toInteger (fromIntMod x) * toInteger (fromIntMod y)
+  abs = id
+  {-# INLINE signum #-}
+  signum = const 1
+  {-# INLINE negate #-}
+  negate = toIntMod . negate . fromIntMod
+
+instance {-# OVERLAPS #-} (IntMod a) => Enum a where
+  toEnum = toIntMod
+  fromEnum = fromIntMod
+
+newtype IntMod9 = IntMod9 {fromIntMod9 :: Int}
+  deriving (Show, Eq, Ord, Real, Integral)
+
+instance IntMod IntMod9 where
+  prime = 998244353
+  toIntMod = IntMod9 . flip mod (prime @ IntMod9)
+  fromIntMod = fromIntMod9
+
+newtype IntMod10 = IntMod10 {fromIntMod10 :: Int}
+  deriving (Show, Eq, Ord, Real, Integral)
+
+instance IntMod IntMod10 where
+  prime = 1000000007
+  toIntMod = IntMod10 . flip mod (prime @ IntMod10)
+  fromIntMod = fromIntMod10
+
+factVectN :: Int -> UV.Vector Int
+factVectN n = UV.prescanl (*) 1 $ UV.generate (n + 1) (+ 1)
 
 -- fixed Prelude
 
