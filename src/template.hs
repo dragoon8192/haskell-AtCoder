@@ -1,3 +1,5 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE AllowAmbiguousTypes, TypeApplications #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE NegativeLiterals, OverloadedStrings #-}
@@ -41,9 +43,9 @@ import qualified Data.IntMap.Strict  as IM
 
 main :: IO ()
 main = runSolver do
+  -- n :: Int <- parseLine
   -- (m, n) :: (Int, Int) <- parseLine
-  -- as :: [Int] <- parseLinesN n
-  -- liftIO $ print (m, n)
+  -- as :: [Int] <- parseLine
   liftIO $ putStrLn "Hello, AtCoder!!"
 
 -- \/ my template \/
@@ -66,40 +68,16 @@ parse parser = do
   where
     getSome = lift $ BS.hGetSome stdin 65535
 
-class LinesParseableN a where
-  parseLinesN' :: Int -> Solver a
-  {-# INLINE parseLinesN #-}
-  parseLinesN :: (Integral n) => n -> Solver a
-  parseLinesN = parseLinesN' . fromIntegral
-
-class LinesParseableNM m where
-  parseLinesNM' :: (LineParseable a) => Int -> Solver (m a)
-  {-# INLINE parseLinesNM #-}
-  parseLinesNM :: (LineParseable a, Integral n) => n -> Solver (m a)
-  parseLinesNM = parseLinesNM' . fromIntegral
-
-instance {-# OVERLAPS #-} (LineParseable a, LinesParseableNM m) => LinesParseableN (m a) where
-  {-# INLINE parseLinesN' #-}
-  parseLinesN' = parseLinesNM'
-
-instance {-# OVERLAPS #-} LinesParseableNM [] where
-  {-# INLINE parseLinesNM' #-}
-  parseLinesNM' n = AP.count n parseLine
-
-instance {-# OVERLAPS #-} LinesParseableNM V.Vector where
-  {-# INLINE parseLinesNM' #-}
-  parseLinesNM' n = V.replicateM n parseLine
-
-instance {-# OVERLAPS #-} (LineParseable a, UV.Unbox a) => LinesParseableN (UV.Vector a) where
-  {-# INLINE parseLinesN' #-}
-  parseLinesN' n = UV.replicateM n parseLine
-
 class ParseableElement a where
   parser :: AP.Parser a
 
 instance ParseableElement BS.ByteString where
   {-# INLINE parser #-}
   parser = AP.takeTill AP.isSpace
+
+instance ParseableElement String where
+  {-# INLINE parser #-}
+  parser = BS.unpack <$> AP.takeTill AP.isSpace
 
 instance {-# OVERLAPS #-} (Integral a) => ParseableElement a where
   {-# INLINE parser #-}
@@ -130,11 +108,6 @@ instance (ParseableElement a, ParseableElement b, ParseableElement c) => LinePar
                       <*> parser <* AP.many1 spaceOrTab
                       <*> parser <* AP.endOfLine
 
-{-# INLINE spaceOrTab #-}
-spaceOrTab :: AP.Parser Char
-spaceOrTab = AP.char ' ' <|> AP.char '\t'
-  -- AP.space は \n も含む
-
 class LineParseableWithN a where
   lineParserWithN' :: Int -> AP.Parser a
   {-# INLINE lineParserWithN #-}
@@ -155,6 +128,39 @@ instance (ParseableElement a) => LineParseableWithN (V.Vector a) where
 instance (ParseableElement a, UV.Unbox a) => LineParseableWithN (UV.Vector a) where
   {-# INLINE lineParserWithN' #-}
   lineParserWithN' n = UV.replicateM n (parser <* (AP.many1 spaceOrTab <|> pure [])) <* AP.endOfLine
+
+class LinesParseableN a where
+  parseLinesN' :: Int -> Solver a
+  {-# INLINE parseLinesN #-}
+  parseLinesN :: (Integral n) => n -> Solver a
+  parseLinesN = parseLinesN' . fromIntegral
+
+class LinesParseableNM m where
+  parseLinesNM' :: (LineParseable a) => Int -> Solver (m a)
+  {-# INLINE parseLinesNM #-}
+  parseLinesNM :: (LineParseable a, Integral n) => n -> Solver (m a)
+  parseLinesNM = parseLinesNM' . fromIntegral
+
+instance {-# OVERLAPS #-} (LineParseable a, LinesParseableNM m) => LinesParseableN (m a) where
+  {-# INLINE parseLinesN' #-}
+  parseLinesN' = parseLinesNM'
+
+instance {-# OVERLAPS #-} LinesParseableNM [] where
+  {-# INLINE parseLinesNM' #-}
+  parseLinesNM' n = AP.count n parseLine
+
+instance {-# OVERLAPS #-} LinesParseableNM V.Vector where
+  {-# INLINE parseLinesNM' #-}
+  parseLinesNM' n = V.replicateM n parseLine
+
+instance {-# OVERLAPS #-} (LineParseable a, UV.Unbox a) => LinesParseableN (UV.Vector a) where
+  {-# INLINE parseLinesN' #-}
+  parseLinesN' n = UV.replicateM n parseLine
+
+{-# INLINE spaceOrTab #-}
+spaceOrTab :: AP.Parser Char
+spaceOrTab = AP.char ' ' <|> AP.char '\t'
+  -- AP.space は \n も含む
 
 -- '#', '.' <-> True, False
 
@@ -207,7 +213,44 @@ exGcd a b = (g, y, x - d * y)
   -- 拡張Euclidの互除法
   -- a * x + b * y == gcd a b
 
-factVectN n = UV.prescanl (*) 1 $ UV.generate (n+1) (+1)
+class IntMod a where
+  prime :: Int
+  toIntMod :: Int -> a
+  fromIntMod :: a -> Int
+
+instance {-# OVERLAPS #-} (IntMod a) => Num a where
+  {-# INLINE fromInteger #-}
+  fromInteger = toIntMod . fromInteger
+  x + y = toIntMod $ fromIntMod x + fromIntMod y
+  x * y = fromInteger $ toInteger (fromIntMod x) * toInteger (fromIntMod y)
+  abs = id
+  {-# INLINE signum #-}
+  signum = const 1
+  {-# INLINE negate #-}
+  negate = toIntMod . negate . fromIntMod
+
+instance {-# OVERLAPS #-} (IntMod a) => Enum a where
+  toEnum = toIntMod
+  fromEnum = fromIntMod
+
+newtype IntMod9 = IntMod9 {fromIntMod9 :: Int}
+  deriving (Show, Eq, Ord, Real, Integral)
+
+instance IntMod IntMod9 where
+  prime = 998244353
+  toIntMod = IntMod9 . flip mod (prime @ IntMod9)
+  fromIntMod = fromIntMod9
+
+newtype IntMod10 = IntMod10 {fromIntMod10 :: Int}
+  deriving (Show, Eq, Ord, Real, Integral)
+
+instance IntMod IntMod10 where
+  prime = 1000000007
+  toIntMod = IntMod10 . flip mod (prime @ IntMod10)
+  fromIntMod = fromIntMod10
+
+factVectN :: Int -> UV.Vector Int
+factVectN n = UV.prescanl (*) 1 $ UV.generate (n + 1) (+ 1)
 
 -- fixed Prelude
 
