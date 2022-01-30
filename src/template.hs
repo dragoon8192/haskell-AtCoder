@@ -25,7 +25,9 @@ import Data.ByteString.Char8 ( ByteString )
 import qualified Data.ByteString.Char8            as BS
 import qualified Data.Attoparsec.ByteString.Char8 as AP
 import qualified Data.Vector as V
+import Data.Vector ( (!), (//) )
 import qualified Data.Vector.Unboxed as UV
+import Data.Vector.Unboxed ( (!), (//) )
 
 -- For main.
 
@@ -237,11 +239,11 @@ instance {-# OVERLAPS #-} (IntMod a, Enum (BaseInt a)) => Enum a where
   fromEnum = fromEnum . fromIntMod
 
 instance {-# OVERLAPS #-} (IntMod a, Real a, Integral (BaseInt a)) => Integral a where
-  quotRem x y = (x + inv y, 0)
+  quotRem x y = (x * invY, 0)
     where
-      inv x = toIntMod invX
-      (_, invX, _) = exGcd (fromIntMod x) prime
-
+      invY = toIntMod invY' :: a
+      (_, invY', _) = exGcd (fromIntMod y) (prime @ a)
+  toInteger = toInteger . fromIntMod
 
 newtype IntMod9 = IntMod9 {fromIntMod9 :: Int}
   deriving (Show, Eq, Ord, Real)
