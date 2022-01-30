@@ -7,6 +7,8 @@
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE TupleSections, MultiWayIf #-}
 
+{-# LANGUAGE Strict #-}
+
 -- For template functions.
 
 import Prelude hiding ( sum, product )
@@ -44,9 +46,15 @@ import qualified Data.IntMap.Strict  as IM
 main :: IO ()
 main = runSolver do
   -- n :: Int <- parseLine
-  -- (m, n) :: (Int, Int) <- parseLine
-  -- as :: [Int] <- parseLine
-  liftIO $ putStrLn "Hello, AtCoder!!"
+  (n, l, w) :: (Integer, Integer, Integer) <- parseLine
+  as :: [Integer] <- parseLine
+  let a0 = head as
+  let
+    tatami x y = max 0 $ div (y - x + w - 1) w
+    func k [] = k
+    func k [a] = k + tatami (a + w) l
+    func k (a0:a1:as) = func (k + tatami (a0 + w) a1) (a1:as)
+  liftIO $ print $ func (tatami 0 a0) as
 
 -- \/ my template \/
 

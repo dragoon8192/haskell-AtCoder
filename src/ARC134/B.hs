@@ -24,6 +24,7 @@ import qualified Data.ByteString.Char8            as BS
 import qualified Data.Attoparsec.ByteString.Char8 as AP
 import qualified Data.Vector as V
 import qualified Data.Vector.Unboxed as UV
+import Data.Vector.Unboxed ( (!), (//) )
 
 -- For main.
 
@@ -43,10 +44,24 @@ import qualified Data.IntMap.Strict  as IM
 
 main :: IO ()
 main = runSolver do
-  -- n :: Int <- parseLine
-  -- (m, n) :: (Int, Int) <- parseLine
-  -- as :: [Int] <- parseLine
-  liftIO $ putStrLn "Hello, AtCoder!!"
+  n :: Int <- parseLine
+  str <- BS.unpack <$> parseLine
+  let vect = UV.fromList str
+  let revVect = UV.reverse vect
+  let
+    minIndexRange l r  = r - UV.minIndex revVectlr
+      where
+        revVectlr = UV.slice (n - 1 - r) (r - l + 1) revVect
+    diffPairs = calc 0 (n - 1)
+    calc l r
+      | l < r && vl == vm   = calc (l + 1) r
+      | l < r && otherwise  = (l, vm) : (m, vl) : calc (l + 1) (m - 1)
+      | otherwise = []
+        where
+          m = minIndexRange l r
+          vl = vect ! l
+          vm = vect ! m
+  liftIO $ putStrLn $ UV.toList $ vect // diffPairs
 
 -- \/ my template \/
 
