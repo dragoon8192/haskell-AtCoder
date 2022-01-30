@@ -61,7 +61,7 @@ main = runSolver do
           m = minIndexRange l r
           vl = vect ! l
           vm = vect ! m
-  liftIO $ putStrLn $ UV.toList $ vect // diffPairs
+  liftIO $ putStrLn $ UV.toList $ UV.unsafeUpd vect diffPairs
 
 -- \/ my template \/
 
