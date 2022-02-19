@@ -52,8 +52,6 @@ main = runSolver do
   -- (m, n) :: (Int, Int) <- parseLine
   -- as :: [Int] <- parseLine
   liftIO $ putStrLn "Hello, AtCoder!!"
-  array :: R.Array R.U R.DIM2 Int <- parseArrayMN 2 2
-  liftIO $ print array
 
 -- \/ my template \/
 
