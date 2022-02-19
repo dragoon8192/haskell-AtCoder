@@ -28,8 +28,8 @@ import qualified Data.Vector as V
 import Data.Vector ( (!), (//) )
 import qualified Data.Vector.Unboxed as UV
 import Data.Vector.Unboxed ( (!), (//) )
-
--- For main.
+import qualified Data.Array.Repa                  as R
+import           Data.Array.Repa ( DIM0, DIM1, DIM2, (:.) ((:.)) )
 
 import Debug.Trace
 import Data.Maybe
@@ -47,10 +47,13 @@ import qualified Data.IntMap.Strict  as IM
 
 main :: IO ()
 main = runSolver do
-  -- n :: Int <- parseLine
+  -- str :: String <- BS.unpack <$> parseLine
+  -- x :: Int <- parseLine
   -- (m, n) :: (Int, Int) <- parseLine
   -- as :: [Int] <- parseLine
   liftIO $ putStrLn "Hello, AtCoder!!"
+  array :: R.Array R.U R.DIM2 Int <- parseArrayMN 2 2
+  liftIO $ print array
 
 -- \/ my template \/
 
@@ -74,16 +77,15 @@ parse parser = do
 
 class ParseableElement a where
   parser :: AP.Parser a
+  {-# INLINE parseElement #-}
+  parseElement :: Solver a
+  parseElement = parse $ parser <* AP.endOfLine
 
 instance ParseableElement BS.ByteString where
   {-# INLINE parser #-}
   parser = AP.takeTill AP.isSpace
 
-instance ParseableElement String where
-  {-# INLINE parser #-}
-  parser = BS.unpack <$> AP.takeTill AP.isSpace
-
-instance {-# OVERLAPS #-} (Integral a) => ParseableElement a where
+instance {-# OVERLAPPABLE #-} (Integral a) => ParseableElement a where
   {-# INLINE parser #-}
   parser = AP.signed AP.decimal
 
@@ -93,7 +95,7 @@ class LineParseable a where
   parseLine :: Solver a
   parseLine = parse lineParser
 
-instance {-# OVERLAPS #-} (ParseableElement a) => LineParseable a where
+instance {-# OVERLAPPABLE #-} (ParseableElement a) => LineParseable a where
   {-# INLINE lineParser #-}
   lineParser = parser <* AP.endOfLine
 
@@ -145,21 +147,32 @@ class LinesParseableNM m where
   parseLinesNM :: (LineParseable a, Integral n) => n -> Solver (m a)
   parseLinesNM = parseLinesNM' . fromIntegral
 
-instance {-# OVERLAPS #-} (LineParseable a, LinesParseableNM m) => LinesParseableN (m a) where
+instance {-# OVERLAPPABLE #-} (LineParseable a, LinesParseableNM m) => LinesParseableN (m a) where
   {-# INLINE parseLinesN' #-}
   parseLinesN' = parseLinesNM'
 
-instance {-# OVERLAPS #-} LinesParseableNM [] where
+instance LinesParseableNM [] where
   {-# INLINE parseLinesNM' #-}
   parseLinesNM' n = AP.count n parseLine
 
-instance {-# OVERLAPS #-} LinesParseableNM V.Vector where
+instance LinesParseableNM V.Vector where
   {-# INLINE parseLinesNM' #-}
   parseLinesNM' n = V.replicateM n parseLine
 
-instance {-# OVERLAPS #-} (LineParseable a, UV.Unbox a) => LinesParseableN (UV.Vector a) where
+instance (LineParseable a, UV.Unbox a) => LinesParseableN (UV.Vector a) where
   {-# INLINE parseLinesN' #-}
   parseLinesN' n = UV.replicateM n parseLine
+
+class ParseableArray a where
+  arrayParserMN' :: Int -> Int -> AP.Parser a
+  {-# INLINE arrayParserMN #-}
+  arrayParserMN :: (Integral m, Integral n) => m -> n -> AP.Parser a
+  arrayParserMN m n = arrayParserMN' (fromIntegral m) (fromIntegral n)
+  parseArrayMN :: (Integral m, Integral n) => m -> n -> Solver a
+  parseArrayMN m n = parse $ arrayParserMN m n
+
+instance (ParseableElement a, UV.Unbox a) => ParseableArray (R.Array R.U R.DIM2 a) where
+  arrayParserMN' m n = R.fromUnboxed (R.Z :. m :. n) <$> UV.replicateM (m * n) (parser <* AP.space)
 
 {-# INLINE spaceOrTab #-}
 spaceOrTab :: AP.Parser Char
@@ -226,7 +239,7 @@ class IntMod a where
     where
       (_, baseInvX, _) = exGcd (fromIntMod x) (prime @ a)
 
-instance {-# OVERLAPS #-} (IntMod a) => Num a where
+instance {-# OVERLAPPABLE #-} (IntMod a) => Num a where
   {-# INLINE fromInteger #-}
   fromInteger = toIntMod . fromInteger
   x + y = toIntMod $ fromIntMod x + fromIntMod y
@@ -237,26 +250,26 @@ instance {-# OVERLAPS #-} (IntMod a) => Num a where
   {-# INLINE negate #-}
   negate = toIntMod . negate . fromIntMod
 
-instance {-# OVERLAPS #-} (IntMod a) => Enum a where
+instance {-# OVERLAPPABLE #-} (IntMod a) => Enum a where
   {-# INLINE toEnum #-}
   toEnum = toIntMod . toEnum
   {-# INLINE fromEnum #-}
   fromEnum = fromEnum . fromIntMod
 
-instance {-# OVERLAPS #-} (IntMod a, Real a) => Integral a where
+instance {-# OVERLAPPABLE #-} (IntMod a, Real a) => Integral a where
   quotRem x y = (x * inv y, 0)
   toInteger = toInteger . fromIntMod
 
-instance {-# OVERLAPS #-} (IntMod a) => Show a where
+instance {-# OVERLAPPABLE #-} (IntMod a) => Show a where
   show = show . fromIntMod
 
-instance {-# OVERLAPS #-} (IntMod a) => Eq a where
+instance {-# OVERLAPPABLE #-} (IntMod a) => Eq a where
   x == y = fromIntMod x == fromIntMod y
 
-instance {-# OVERLAPS #-} (IntMod a) => Ord a where
+instance {-# OVERLAPPABLE #-} (IntMod a) => Ord a where
   compare x y = compare (fromIntMod x) (fromIntMod y)
 
-instance {-# OVERLAPS #-} (IntMod a) => Real a where
+instance {-# OVERLAPPABLE #-} (IntMod a) => Real a where
   toRational = toRational . fromIntMod
 
 newtype IntMod9 = IntMod9 {fromIntMod9 :: Int}
