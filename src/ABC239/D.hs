@@ -50,8 +50,25 @@ main = runSolver do
   -- str :: String <- BS.unpack <$> parseLine
   -- x :: Int <- parseLine
   -- (m, n) :: (Int, Int) <- parseLine
-  -- as :: [Int] <- parseLine
-  liftIO $ putStrLn "Hello, AtCoder!!"
+  [a,b,c,d] :: [Int] <- parseLine
+  let p1 = L.takeWhile (<= b+d) . L.dropWhile (< a + c) $ primes
+  let p2 = (a + c - 1) : p1 ++ [ b + d + 1 ]
+  liftIO $ putStrLn . ifTakahashiAoki . diffsAny (> d - c + 1) $ p2
+
+primes :: [Int]
+primes = 2 : func [3,5..]
+  where
+    func (a:as) = (a :) . func $ L.filter (\x -> mod x a /= 0) as
+    func [] = []
+
+diffsAny :: (Int -> Bool) -> [Int] -> Bool
+diffsAny f (a:b:cs) = if f (b - a)
+                      then True
+                      else diffsAny f (b:cs)
+diffsAny _ [a] = False
+diffsAny _ [] = False
+
+ifTakahashiAoki b = if b then "Takahashi" else "Aoki"
 
 -- \/ my template \/
 

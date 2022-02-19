@@ -43,15 +43,16 @@ import qualified Data.Map.Strict     as M
 import qualified Data.IntSet         as IS
 import qualified Data.IntMap.Strict  as IM
 
+import Data.Int
 -- /\ my template /\
 
 main :: IO ()
 main = runSolver do
   -- str :: String <- BS.unpack <$> parseLine
-  -- x :: Int <- parseLine
+  x :: Int64 <- parseLine
   -- (m, n) :: (Int, Int) <- parseLine
   -- as :: [Int] <- parseLine
-  liftIO $ putStrLn "Hello, AtCoder!!"
+  liftIO $ print $ div x 10
 
 -- \/ my template \/
 

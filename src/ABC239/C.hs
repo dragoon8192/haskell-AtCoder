@@ -50,9 +50,13 @@ main = runSolver do
   -- str :: String <- BS.unpack <$> parseLine
   -- x :: Int <- parseLine
   -- (m, n) :: (Int, Int) <- parseLine
-  -- as :: [Int] <- parseLine
-  liftIO $ putStrLn "Hello, AtCoder!!"
+  [x1, y1, x2, y2] :: [Int] <- parseLine
+  let int = L.intersect (knight (x1,y1)) (knight (x2,y2))
+  liftIO $ printYesNo $ not $ null int
 
+knight :: (Int,Int) -> [(Int,Int)]
+knight (x, y) = [(x', y') | x' <- [x - 1, x + 1], y' <- [y - 2, y + 2] ]
+          ++ [(x', y') | x' <- [x - 2, x + 2], y' <- [y - 1, y + 1] ]
 -- \/ my template \/
 
 -- Solver

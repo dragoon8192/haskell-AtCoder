@@ -43,16 +43,20 @@ import qualified Data.Map.Strict     as M
 import qualified Data.IntSet         as IS
 import qualified Data.IntMap.Strict  as IM
 
-
 -- /\ my template /\
 
 main :: IO ()
 main = runSolver do
   -- str :: String <- BS.unpack <$> parseLine
-  h :: Int <- parseLine
-  -- (m, n) :: (Int, Int) <- parseLine
-  -- as :: [Int] <- parseLine
-  liftIO $ print $ sqrt . fromIntegral $ h * (h + 12800000)
+  -- x :: Int <- parseLine
+  (n, m) :: (Int, Int) <- parseLine
+  let
+    ex :: Int -> IntMod10
+    ex 1 = toIntMod 0
+    ex x = (+ 1) . (inv (toIntMod n) *) . sum . map (\y -> (* toIntMod (n - y + 1) ) . ex $ divF x y) $ [2..n]
+    divF :: Int -> Int -> Int
+    divF x y = ceiling (fromIntegral x / fromIntegral y)
+  liftIO $ print $ ex m
 
 -- \/ my template \/
 
