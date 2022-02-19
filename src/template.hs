@@ -218,12 +218,15 @@ exGcd a b = (g, y, x - d * y)
   -- a * x + b * y == gcd a b
 
 class IntMod a where
-  type BaseInt a :: *
-  prime :: BaseInt a
-  toIntMod :: BaseInt a -> a
-  fromIntMod :: a -> BaseInt a
+  prime :: Int
+  toIntMod :: Int -> a
+  fromIntMod :: a -> Int
+  inv :: a -> a
+  inv x = toIntMod baseInvX
+    where
+      (_, baseInvX, _) = exGcd (fromIntMod x) (prime @ a)
 
-instance {-# OVERLAPS #-} (IntMod a, Integral (BaseInt a)) => Num a where
+instance {-# OVERLAPS #-} (IntMod a) => Num a where
   {-# INLINE fromInteger #-}
   fromInteger = toIntMod . fromInteger
   x + y = toIntMod $ fromIntMod x + fromIntMod y
@@ -234,31 +237,38 @@ instance {-# OVERLAPS #-} (IntMod a, Integral (BaseInt a)) => Num a where
   {-# INLINE negate #-}
   negate = toIntMod . negate . fromIntMod
 
-instance {-# OVERLAPS #-} (IntMod a, Enum (BaseInt a)) => Enum a where
+instance {-# OVERLAPS #-} (IntMod a) => Enum a where
+  {-# INLINE toEnum #-}
   toEnum = toIntMod . toEnum
+  {-# INLINE fromEnum #-}
   fromEnum = fromEnum . fromIntMod
 
-instance {-# OVERLAPS #-} (IntMod a, Real a, Integral (BaseInt a)) => Integral a where
-  quotRem x y = (x * invY, 0)
-    where
-      invY = toIntMod invY' :: a
-      (_, invY', _) = exGcd (fromIntMod y) (prime @ a)
+instance {-# OVERLAPS #-} (IntMod a, Real a) => Integral a where
+  quotRem x y = (x * inv y, 0)
   toInteger = toInteger . fromIntMod
 
+instance {-# OVERLAPS #-} (IntMod a) => Show a where
+  show = show . fromIntMod
+
+instance {-# OVERLAPS #-} (IntMod a) => Eq a where
+  x == y = fromIntMod x == fromIntMod y
+
+instance {-# OVERLAPS #-} (IntMod a) => Ord a where
+  compare x y = compare (fromIntMod x) (fromIntMod y)
+
+instance {-# OVERLAPS #-} (IntMod a) => Real a where
+  toRational = toRational . fromIntMod
+
 newtype IntMod9 = IntMod9 {fromIntMod9 :: Int}
-  deriving (Show, Eq, Ord, Real)
 
 instance IntMod IntMod9 where
-  type BaseInt IntMod9 = Int
   prime = 998244353
   toIntMod = IntMod9 . flip mod (prime @ IntMod9)
   fromIntMod = fromIntMod9
 
 newtype IntMod10 = IntMod10 {fromIntMod10 :: Int}
-  deriving (Show, Eq, Ord, Real)
 
 instance IntMod IntMod10 where
-  type BaseInt IntMod10 = Int
   prime = 1000000007
   toIntMod = IntMod10 . flip mod (prime @ IntMod10)
   fromIntMod = fromIntMod10
