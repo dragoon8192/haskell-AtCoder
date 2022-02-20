@@ -48,10 +48,27 @@ import qualified Data.IntMap.Strict  as IM
 main :: IO ()
 main = runSolver do
   -- str :: String <- BS.unpack <$> parseLine
-  -- x :: Int <- parseLine
+  n :: Int <- parseLine
   -- (m, n) :: (Int, Int) <- parseLine
-  -- as :: [Int] <- parseLine
-  liftIO $ putStrLn "Hello, AtCoder!!"
+  as :: [Int] <- parseLine
+  liftIO $ putStr . unlines . map show $ func 0 0 [] as
+
+func :: Int -> Int -> [Int] -> [Int] -> [Int]
+func _ _ _ [] = []
+func _ _ [] (a:as) = 1 : func 1 1 [a] as
+func l lbb bs@(b: _) (a: as)
+  | a == b && lbb + 1 == a  = (l + 1 - a) : func (l + 1 - a)  (headsCount bs1) bs1 as
+  | a == b && otherwise     = (l + 1)     : func (l + 1)      (lbb + 1) bs2 as
+  | otherwise               = (l + 1)     : func (l + 1) 1 bs2 as
+    where
+      bs2 = a : bs
+      (aa, bs1) = L.span (== a) bs2
+
+headsCount [] = 0
+headsCount [a] = 1
+headsCount (a:b:cs)
+  | a == b    = 1 + headsCount (b:cs)
+  |otherwise  = 1
 
 -- \/ my template \/
 

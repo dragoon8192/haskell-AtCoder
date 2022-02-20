@@ -48,10 +48,11 @@ import qualified Data.IntMap.Strict  as IM
 main :: IO ()
 main = runSolver do
   -- str :: String <- BS.unpack <$> parseLine
-  -- x :: Int <- parseLine
+  n :: Int <- parseLine
   -- (m, n) :: (Int, Int) <- parseLine
-  -- as :: [Int] <- parseLine
-  liftIO $ putStrLn "Hello, AtCoder!!"
+  as :: [Int] <- parseLine
+  let set = IS.fromList as
+  liftIO $ print . IS.size $ set
 
 -- \/ my template \/
 

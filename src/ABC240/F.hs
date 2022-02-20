@@ -42,17 +42,28 @@ import qualified Data.Set            as S
 import qualified Data.Map.Strict     as M
 import qualified Data.IntSet         as IS
 import qualified Data.IntMap.Strict  as IM
+import Control.Monad
 
 -- /\ my template /\
 
 main :: IO ()
 main = runSolver do
   -- str :: String <- BS.unpack <$> parseLine
-  -- x :: Int <- parseLine
-  (a, b) :: (Int, Int) <- parseLine
+  t :: Int <- parseLine
+  -- (m, n) :: (Int, Int) <- parseLine
   -- as :: [Int] <- parseLine
-  let d = mod (b - a) 10
-  liftIO $ printYesNo $ d == 1 || d == 9
+  testLoop t
+
+testLoop t = replicateM_ t do
+  (n, m) :: (Int, Int) <- parseLine
+  xys :: [(Int,Int)] <- parseLinesN n
+--  let cs = concatMap func xys
+--  let bs = scanl1 (+) cs
+--  let as = scanl1 (+) bs
+--  liftIO $ print $ L.maximum as
+
+func :: (Int, Int) -> [Int]
+func (x, y) = L.replicate y x
 
 -- \/ my template \/
 

@@ -49,10 +49,12 @@ main :: IO ()
 main = runSolver do
   -- str :: String <- BS.unpack <$> parseLine
   -- x :: Int <- parseLine
-  -- (m, n) :: (Int, Int) <- parseLine
-  -- as :: [Int] <- parseLine
-  liftIO $ putStrLn "Hello, AtCoder!!"
+  (n, x) :: (Int, Int) <- parseLine
+  abs :: [(Int, Int)] <- parseLinesN n
+  let jumps = L.foldl jumpT (IS.singleton 0) abs
+  liftIO $ printYesNo $ IS.member x jumps
 
+jumpT set (a, b) = IS.map (a+) set `IS.union` IS.map (b+) set
 -- \/ my template \/
 
 -- Solver
