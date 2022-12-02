@@ -1,5 +1,6 @@
 # resolver: ghc-8.8.3
-resolver: lts-16.11
+# resolver: lts-16.11
+resolver: lts-18.28
 
 packages:
 - .
