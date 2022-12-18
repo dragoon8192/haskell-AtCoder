@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.4.
+-- This file has been generated from package.yaml by hpack version 0.35.0.
 --
 -- see: https://github.com/sol/hpack
 
@@ -24,67 +24,6 @@ source-repository head
   location: https://github.com/dragoon8192/haskell-AtCoder
 
 library
-  exposed-modules:
-      ABC049.C
-      ABC081.A
-      ABC081.B
-      ABC083.B
-      ABC085.B
-      ABC085.C
-      ABC086.A
-      ABC086.C
-      ABC087.B
-      ABC088.B
-      ABC231.A
-      ABC231.B
-      ABC231.C
-      ABC231.D
-      ABC231.E
-      ABC232.A
-      ABC232.B
-      ABC232.C
-      ABC232.D
-      ABC233.A
-      ABC233.B
-      ABC233.C
-      ABC233.D
-      ABC233.E
-      ABC235.A
-      ABC235.B
-      ABC235.C
-      ABC235.D
-      ABC236.A
-      ABC236.B
-      ABC236.C
-      ABC236.D
-      ABC237.A
-      ABC237.B
-      ABC237.C
-      ABC237.D
-      ABC237.E
-      ABC237.F
-      ABC239.A
-      ABC239.B
-      ABC239.C
-      ABC239.D
-      ABC239.Ex
-      ABC240.A
-      ABC240.B
-      ABC240.C
-      ABC240.D
-      ABC240.F
-      AHC007.A
-      ARC132.A
-      ARC132.B
-      ARC132.C
-      ARC133.A
-      ARC133.B
-      ARC133.C
-      ARC133.D
-      ARC134.A
-      ARC134.B
-      ARC134.C
-      ARC134.D
   other-modules:
       Paths_AtCoder
   hs-source-dirs:
