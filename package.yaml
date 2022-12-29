@@ -58,7 +58,7 @@ dependencies:
 - vector-th-unbox
 
 library:
-  source-dirs: src
+  source-dirs: src, contest, old
 
 executables:
   AtCoder-exe:

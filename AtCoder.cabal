@@ -27,7 +27,7 @@ library
   other-modules:
       Paths_AtCoder
   hs-source-dirs:
-      src
+      src, contest, old
   build-depends:
       QuickCheck
     , array

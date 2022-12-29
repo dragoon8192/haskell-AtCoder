@@ -29,13 +29,20 @@
       "id": "abc239_c",
       "label": "C",
       "title": "Knight Fork",
-      "url": "https://atcoder.jp/contests/abc239/tasks/abc239_c"
+      "url": "https://atcoder.jp/contests/abc239/tasks/abc239_c",
+      "directory": {
+        "path": "c",
+        "testdir": "tests"
+      }
     },
     {
       "id": "abc239_d",
       "label": "D",
       "title": "Prime Sum Game",
-      "url": "https://atcoder.jp/contests/abc239/tasks/abc239_d"
+      "url": "https://atcoder.jp/contests/abc239/tasks/abc239_d",
+      "directory": {
+        "path": "d"
+      }
     },
     {
       "id": "abc239_e",
